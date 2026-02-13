@@ -11,10 +11,12 @@ import Manifesto from "@/components/verdea/Manifesto";
 import FAQ from "@/components/verdea/FAQ";
 import FinalCTA from "@/components/verdea/FinalCTA";
 import Footer from "@/components/verdea/Footer";
+import SocialProof from "@/components/verdea/SocialProof";
+import ProgressBar from "@/components/verdea/ProgressBar";
 
 const Index = () => {
   return (
-    <main className="min-h-screen bg-background">
+    <main className="min-h-screen bg-background pb-12">
       <Navbar />
       <Hero />
       <Problem />
@@ -28,6 +30,8 @@ const Index = () => {
       <FAQ />
       <FinalCTA />
       <Footer />
+      <SocialProof />
+      <ProgressBar />
     </main>
   );
 };

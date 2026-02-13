@@ -32,12 +32,14 @@ export default function Navbar() {
       <div className="container mx-auto px-4 flex items-center justify-between">
         {/* Logo */}
         <a href="#hero" className="flex items-center gap-2 group">
-          <Leaf className="w-7 h-7 text-secondary group-hover:text-accent transition-colors" />
+          <Leaf className={`w-7 h-7 transition-colors ${scrolled ? "text-secondary" : "text-primary-foreground"} group-hover:text-accent`} />
           <div>
-            <span className="font-serif text-xl font-bold text-foreground tracking-wide">
+            <span className={`font-serif text-xl font-bold tracking-wide transition-colors ${scrolled ? "text-foreground" : "text-primary-foreground"}`}
+              style={!scrolled ? { textShadow: "0 1px 3px rgba(0,0,0,0.3)" } : {}}
+            >
               Verdea
             </span>
-            <span className="block text-[9px] tracking-[0.3em] uppercase text-muted-foreground font-sans -mt-1">
+            <span className={`block text-[9px] tracking-[0.3em] uppercase font-sans -mt-1 transition-colors ${scrolled ? "text-muted-foreground" : "text-primary-foreground/70"}`}>
               Garden Center
             </span>
           </div>
@@ -49,7 +51,12 @@ export default function Navbar() {
             <a
               key={link.href}
               href={link.href}
-              className="text-sm font-sans text-muted-foreground hover:text-foreground transition-colors relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-secondary after:transition-all hover:after:w-full"
+              className={`text-sm font-sans transition-colors relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:transition-all hover:after:w-full ${
+                scrolled
+                  ? "text-muted-foreground hover:text-foreground after:bg-secondary"
+                  : "text-primary-foreground/80 hover:text-primary-foreground after:bg-primary-foreground"
+              }`}
+              style={!scrolled ? { textShadow: "0 1px 2px rgba(0,0,0,0.25)" } : {}}
             >
               {link.label}
             </a>
@@ -64,7 +71,7 @@ export default function Navbar() {
 
         {/* Mobile toggle */}
         <button
-          className="lg:hidden text-foreground p-2"
+          className={`lg:hidden p-2 ${scrolled ? "text-foreground" : "text-primary-foreground"}`}
           onClick={() => setMobileOpen(!mobileOpen)}
         >
           {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}

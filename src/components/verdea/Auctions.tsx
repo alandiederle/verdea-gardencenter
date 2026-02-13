@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
-import { Timer, Trophy, Ticket } from "lucide-react";
+import { Trophy, Ticket } from "lucide-react";
 
 export default function Auctions() {
   const { ref, isVisible } = useScrollAnimation();
@@ -73,18 +73,18 @@ export default function Auctions() {
                   Ejemplar único de 1.5m, maceta artesanal incluida.
                 </p>
 
-                {/* Countdown */}
-                <div className="flex items-center gap-2 mb-8">
-                  <Timer className="w-4 h-4 text-secondary" />
-                  <div className="flex gap-2">
+                {/* Countdown - prominent */}
+                <div className="mb-8">
+                  <p className="text-xs font-sans text-muted-foreground uppercase tracking-wider mb-3">Finaliza en</p>
+                  <div className="flex gap-3">
                     {[
-                      { val: pad(timeLeft.h), label: "hs" },
-                      { val: pad(timeLeft.m), label: "min" },
-                      { val: pad(timeLeft.s), label: "seg" },
+                      { val: pad(timeLeft.h), label: "Horas" },
+                      { val: pad(timeLeft.m), label: "Min" },
+                      { val: pad(timeLeft.s), label: "Seg" },
                     ].map(({ val, label }) => (
-                      <div key={label} className="bg-muted rounded-lg px-3 py-2 text-center min-w-[48px]">
-                        <span className="text-lg font-bold font-sans text-foreground">{val}</span>
-                        <span className="block text-[10px] text-muted-foreground">{label}</span>
+                      <div key={label} className="bg-muted rounded-xl px-4 py-3 text-center min-w-[72px]">
+                        <span className="text-3xl font-bold font-sans text-foreground tabular-nums block leading-none mb-1">{val}</span>
+                        <span className="text-[10px] text-muted-foreground uppercase tracking-wider">{label}</span>
                       </div>
                     ))}
                   </div>
