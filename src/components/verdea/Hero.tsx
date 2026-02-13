@@ -25,7 +25,10 @@ export default function Hero() {
       {/* Content */}
       <div className="relative z-10 container mx-auto px-4 py-32 lg:py-0">
         <div className="max-w-2xl">
-          <h1 className="text-4xl sm:text-5xl lg:text-7xl font-serif font-bold text-primary-foreground leading-tight mb-2">
+          <h1
+            className="text-4xl sm:text-5xl lg:text-7xl font-serif font-bold text-primary-foreground leading-tight mb-2"
+            style={{ textShadow: "0 2px 8px rgba(0,0,0,0.25), 0 1px 3px rgba(0,0,0,0.15)" }}
+          >
             El jardín evoluciona.
             <br />
             <span className="italic">Vos también.</span>
@@ -36,7 +39,10 @@ export default function Hero() {
             style={{ width: `${vineWidth}%`, maxWidth: "320px" }}
           />
 
-          <p className="text-lg sm:text-xl text-primary-foreground/85 font-sans leading-relaxed mb-10 max-w-lg">
+          <p
+            className="text-lg sm:text-xl text-primary-foreground/85 font-sans leading-relaxed mb-10 max-w-lg"
+            style={{ textShadow: "0 1px 4px rgba(0,0,0,0.2)" }}
+          >
             Todo lo que necesitás para tu jardín, con innovación, diseño y un sistema que recompensa cada paso.
           </p>
 

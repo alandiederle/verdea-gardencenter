@@ -1,10 +1,11 @@
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
+import { ShoppingBag, Users, Gift, TrendingUp } from "lucide-react";
 
 const painPoints = [
-  "Comprás plantas, pero no hay beneficios.",
-  "No hay comunidad.",
-  "No hay recompensa.",
-  "No hay evolución.",
+  { text: "Comprás plantas, pero no hay beneficios.", icon: ShoppingBag },
+  { text: "No hay comunidad.", icon: Users },
+  { text: "No hay recompensa.", icon: Gift },
+  { text: "No hay evolución.", icon: TrendingUp },
 ];
 
 export default function Problem() {
@@ -12,9 +13,9 @@ export default function Problem() {
 
   return (
     <section className="py-24 lg:py-32 bg-muted/50 relative overflow-hidden">
-      <div ref={ref} className="container mx-auto px-4 max-w-3xl text-center">
+      <div ref={ref} className="container mx-auto px-4 max-w-4xl text-center">
         <h2
-          className={`text-3xl sm:text-4xl lg:text-5xl font-serif font-bold text-foreground mb-12 transition-all duration-700 ${
+          className={`text-3xl sm:text-4xl lg:text-5xl font-serif font-bold text-foreground mb-14 transition-all duration-700 ${
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
           }`}
         >
@@ -23,18 +24,26 @@ export default function Problem() {
           <span className="text-muted-foreground italic">Pero tu experiencia no.</span>
         </h2>
 
-        <div className="space-y-5 mb-14">
-          {painPoints.map((point, i) => (
-            <p
-              key={i}
-              className={`text-lg font-sans text-muted-foreground transition-all duration-500 ${
-                isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
-              }`}
-              style={{ transitionDelay: `${300 + i * 150}ms` }}
-            >
-              {point}
-            </p>
-          ))}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 max-w-3xl mx-auto mb-14">
+          {painPoints.map((point, i) => {
+            const Icon = point.icon;
+            return (
+              <div
+                key={i}
+                className={`flex items-center gap-4 p-5 rounded-2xl bg-card border border-border text-left transition-all duration-500 hover:shadow-md hover:border-secondary/20 ${
+                  isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+                }`}
+                style={{ transitionDelay: `${300 + i * 150}ms` }}
+              >
+                <div className="w-11 h-11 rounded-full bg-muted flex items-center justify-center shrink-0">
+                  <Icon className="w-5 h-5 text-muted-foreground" />
+                </div>
+                <p className="text-sm sm:text-base font-sans text-muted-foreground leading-snug">
+                  {point.text}
+                </p>
+              </div>
+            );
+          })}
         </div>
 
         {/* Transition line → stem */}
