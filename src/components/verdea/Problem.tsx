@@ -1,68 +1,115 @@
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
-import { ShoppingBag, Users, Gift, TrendingUp } from "lucide-react";
+import { TrendingUp, Users, Eye, Gift } from "lucide-react";
 
-const painPoints = [
-  { text: "Comprás plantas, pero no hay beneficios.", icon: ShoppingBag },
-  { text: "No hay comunidad.", icon: Users },
-  { text: "No hay recompensa.", icon: Gift },
-  { text: "No hay evolución.", icon: TrendingUp },
+const benefits = [
+  {
+    icon: TrendingUp,
+    title: "Comprás y ganás puntos reales",
+    desc: "Cada compra hace crecer tu nivel dentro del club.",
+  },
+  {
+    icon: Users,
+    title: "Acceso a comunidad y experiencias",
+    desc: "Talleres, sorteos y contenido exclusivo.",
+  },
+  {
+    icon: Eye,
+    title: "Tu progreso se ve y se siente",
+    desc: "Subís niveles y desbloqueás beneficios.",
+  },
+  {
+    icon: Gift,
+    title: "Recompensas constantes",
+    desc: "Tickets, premios y plantas especiales.",
+  },
 ];
 
 export default function Problem() {
   const { ref, isVisible } = useScrollAnimation();
 
   return (
-    <section className="py-24 lg:py-32 bg-muted/50 relative overflow-hidden">
-      <div ref={ref} className="container mx-auto px-4 max-w-4xl text-center">
-        <h2
-          className={`text-3xl sm:text-4xl lg:text-5xl font-serif font-bold text-foreground mb-14 transition-all duration-700 ${
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-          }`}
-        >
-          Tu jardín crece.
-          <br />
-          <span className="text-muted-foreground italic">Pero tu experiencia no.</span>
-        </h2>
+    <section className="py-28 lg:py-40 bg-muted/30 relative overflow-hidden">
+      <div ref={ref} className="container mx-auto px-4 max-w-5xl">
+        {/* Main headline — positive, dominant */}
+        <div className="text-center mb-20">
+          <h2
+            className={`text-3xl sm:text-4xl lg:text-6xl font-serif font-bold text-foreground leading-tight mb-6 transition-all duration-700 ${
+              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+            }`}
+          >
+            Tu jardín evoluciona.
+            <br />
+            <span className="italic text-secondary">Y vos también.</span>
+          </h2>
+          <p
+            className={`text-lg sm:text-xl font-sans text-muted-foreground max-w-xl mx-auto transition-all duration-700 delay-200 ${
+              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+            }`}
+          >
+            En Verdie, cada planta suma experiencia, recompensas y comunidad.
+          </p>
+        </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 max-w-3xl mx-auto mb-14">
-          {painPoints.map((point, i) => {
-            const Icon = point.icon;
+        {/* Benefits grid — protagonist */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-8 max-w-4xl mx-auto mb-20">
+          {benefits.map((b, i) => {
+            const Icon = b.icon;
             return (
               <div
                 key={i}
-                className={`flex items-center gap-4 p-5 rounded-2xl bg-card border border-border text-left transition-all duration-500 hover:shadow-md hover:border-secondary/20 ${
-                  isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+                className={`group p-7 lg:p-8 rounded-3xl bg-card border border-border/60 transition-all duration-500 hover:shadow-lg hover:border-secondary/25 hover:-translate-y-1 ${
+                  isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
                 }`}
-                style={{ transitionDelay: `${300 + i * 150}ms` }}
+                style={{ transitionDelay: `${400 + i * 150}ms` }}
               >
-                <div className="w-11 h-11 rounded-full bg-muted flex items-center justify-center shrink-0">
-                  <Icon className="w-5 h-5 text-muted-foreground" />
+                <div className="w-12 h-12 rounded-2xl bg-secondary/10 flex items-center justify-center mb-5 transition-colors group-hover:bg-secondary/15">
+                  <Icon className="w-5 h-5 text-secondary" />
                 </div>
-                <p className="text-sm sm:text-base font-sans text-muted-foreground leading-snug">
-                  {point.text}
+                <h3 className="font-serif font-semibold text-foreground text-base lg:text-lg mb-2">
+                  {b.title}
+                </h3>
+                <p className="text-sm font-sans text-muted-foreground leading-relaxed">
+                  {b.desc}
                 </p>
               </div>
             );
           })}
         </div>
 
-        {/* Transition line → stem */}
-        <div className="flex items-center justify-center mb-8">
+        {/* Subtle market context — secondary, understated */}
+        <div
+          className={`text-center mb-12 transition-all duration-700 ${
+            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+          }`}
+          style={{ transitionDelay: "1000ms" }}
+        >
+          <p className="text-sm font-sans text-muted-foreground/60 max-w-md mx-auto leading-relaxed">
+            La mayoría de los viveros solo vende plantas.
+            <br />
+            Verdie construye una experiencia.
+          </p>
+        </div>
+
+        {/* Transition line */}
+        <div className="flex items-center justify-center mb-10">
           <div
-            className={`h-[2px] bg-gradient-to-r from-transparent via-secondary to-transparent transition-all duration-1000 ${
-              isVisible ? "w-64" : "w-0"
+            className={`h-[2px] bg-gradient-to-r from-transparent via-secondary/40 to-transparent transition-all duration-1000 ${
+              isVisible ? "w-48" : "w-0"
             }`}
-            style={{ transitionDelay: "900ms" }}
+            style={{ transitionDelay: "1200ms" }}
           />
         </div>
 
+        {/* Emotional closer */}
         <p
-          className={`text-xl sm:text-2xl font-serif text-foreground transition-all duration-700 ${
+          className={`text-xl sm:text-2xl font-serif text-foreground text-center transition-all duration-700 ${
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
           }`}
-          style={{ transitionDelay: "1100ms" }}
+          style={{ transitionDelay: "1400ms" }}
         >
-          En Verdea, cada compra es un paso adelante.
+          Acá no solo cultivás plantas.
+          <br />
+          <span className="italic text-secondary">Cultivás progreso.</span>
         </p>
       </div>
     </section>

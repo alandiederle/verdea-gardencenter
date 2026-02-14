@@ -71,7 +71,7 @@ export default function Memberships() {
             Elegí cómo querés crecer.
           </h2>
           <p className={`text-lg font-sans text-muted-foreground transition-all duration-700 delay-200 ${isVisible ? "opacity-100" : "opacity-0"}`}>
-            La evolución natural de tu experiencia en Verdea.
+            La evolución natural de tu experiencia en Verdie.
           </p>
         </div>
 

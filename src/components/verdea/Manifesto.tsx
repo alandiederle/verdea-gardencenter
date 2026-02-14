@@ -42,7 +42,7 @@ export default function Manifesto() {
           >
             <div className="h-px w-24 bg-accent mx-auto mb-8" />
             <p className="text-xl font-serif italic text-primary-foreground/80">
-              En Verdea, crecer no es una metáfora.
+              En Verdie, crecer no es una metáfora.
             </p>
           </div>
         </div>
