@@ -3,7 +3,7 @@ import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { Users, Heart } from "lucide-react";
 
 const testimonials = [
-  { name: "Valentina R.", text: "Verdea cambió mi forma de cuidar plantas. El sistema de puntos es adictivo.", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&h=80&fit=crop&crop=face" },
+  { name: "Valentina R.", text: "Verdie cambió mi forma de cuidar plantas. El sistema de puntos es adictivo.", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&h=80&fit=crop&crop=face" },
   { name: "Martín L.", text: "Gané una Monstera XXL en la subasta. El mejor día de mi vida verde.", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=face" },
   { name: "Sofía P.", text: "La comunidad es increíble. Aprendí más en 2 meses que en 5 años sola.", avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&h=80&fit=crop&crop=face" },
 ];
@@ -82,7 +82,7 @@ export default function Community() {
                 />
                 <div>
                   <span className="font-sans font-semibold text-foreground text-sm">{t.name}</span>
-                  <span className="block text-xs text-accent">Miembro Verdea</span>
+                  <span className="block text-xs text-accent">Miembro Verdie</span>
                 </div>
                 <Heart className="w-4 h-4 text-destructive ml-auto" />
               </div>

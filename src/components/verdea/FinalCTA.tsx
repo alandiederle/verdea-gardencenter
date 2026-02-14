@@ -42,7 +42,7 @@ export default function FinalCTA() {
           }`}
           style={{ transitionDelay: "400ms" }}
         >
-          🌿 Unirme a Verdea
+          🌿 Unirme a Verdie
         </a>
       </div>
     </section>
