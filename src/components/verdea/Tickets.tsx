@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Volume2, VolumeX } from "lucide-react";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { rarities, rollRarity, pickReward } from "./sobres/rarities";
@@ -9,6 +9,17 @@ import DiscoveryGallery, { type Discovery } from "./sobres/DiscoveryGallery";
 
 type Phase = "idle" | "charging" | "exploding" | "revealed";
 
+/* Leaf SVG inline */
+const LeafIcon = ({ size = 44, className = "" }: { size?: number; className?: string }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
+    <path d="M12 2C8 6 4 10 4 14c0 4.4 3.6 8 8 8s8-3.6 8-8c0-4-4-8-8-12z" fill="currentColor" opacity="0.12" />
+    <path d="M12 2C8 6 4 10 4 14c0 4.4 3.6 8 8 8s8-3.6 8-8c0-4-4-8-8-12z" stroke="currentColor" strokeWidth="1.5" fill="none" />
+    <path d="M12 22V8" stroke="currentColor" strokeWidth="1" opacity="0.35" />
+    <path d="M8 16c2-2 4-4 4-8" stroke="currentColor" strokeWidth="0.7" opacity="0.2" />
+    <path d="M16 16c-2-2-4-4-4-8" stroke="currentColor" strokeWidth="0.7" opacity="0.2" />
+  </svg>
+);
+
 export default function Tickets() {
   const { ref, isVisible } = useScrollAnimation();
   const [phase, setPhase] = useState<Phase>("idle");
@@ -16,13 +27,13 @@ export default function Tickets() {
   const [reward, setReward] = useState("");
   const [soundOn, setSoundOn] = useState(true);
   const [discoveries, setDiscoveries] = useState<Discovery[]>([]);
+  const [isHovering, setIsHovering] = useState(false);
   const sound = useSobreSound(soundOn);
 
   const rarity = rarities[resultIdx];
 
   const openSobre = useCallback(() => {
     if (phase !== "idle") return;
-
     const idx = rollRarity();
     const r = rarities[idx];
     const prize = pickReward(r);
@@ -69,7 +80,8 @@ export default function Tickets() {
 
         {/* Sobre + Rewards columns */}
         <div className="flex flex-col lg:flex-row items-center gap-20 max-w-5xl mx-auto">
-          {/* 3D Sobre */}
+
+          {/* ──── 3D COLLECTIBLE SOBRE ──── */}
           <motion.div
             className="flex-1 flex flex-col items-center"
             initial={{ opacity: 0, y: 24 }}
@@ -85,75 +97,177 @@ export default function Tickets() {
               {soundOn ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
             </button>
 
-            {/* 3D Envelope card */}
-            <motion.div
-              className="relative w-64 h-80 sm:w-72 sm:h-96 cursor-pointer group"
-              style={{ perspective: "800px" }}
+            {/* 3D Pack container */}
+            <div
+              className="relative cursor-pointer group"
+              style={{ perspective: "900px" }}
               onClick={openSobre}
-              whileHover={{ scale: 1.04 }}
-              whileTap={{ scale: 0.97 }}
+              onMouseEnter={() => setIsHovering(true)}
+              onMouseLeave={() => setIsHovering(false)}
             >
-              {/* Glow behind */}
-              <div className="absolute inset-0 rounded-3xl bg-secondary/10 blur-2xl scale-90 group-hover:scale-100 group-hover:bg-secondary/20 transition-all duration-500" />
-
-              {/* Main card with 3D tilt */}
+              {/* Ambient glow */}
               <motion.div
-                className="relative w-full h-full rounded-3xl border-2 border-border bg-gradient-to-b from-card via-card to-muted/50
-                  flex flex-col items-center justify-center gap-5 p-8 overflow-hidden
-                  shadow-xl group-hover:shadow-2xl transition-shadow duration-500"
-                animate={{ rotateY: [0, 1, -1, 0], rotateX: [0, -0.5, 0.5, 0] }}
-                transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
+                className="absolute -inset-6 rounded-[2rem] pointer-events-none"
+                style={{
+                  background: "radial-gradient(ellipse at center, hsl(var(--secondary) / 0.12), transparent 70%)",
+                }}
+                animate={{
+                  scale: isHovering ? 1.15 : 1,
+                  opacity: isHovering ? 1 : 0.5,
+                }}
+                transition={{ duration: 0.6 }}
+              />
+
+              {/* Main 3D card */}
+              <motion.div
+                className="relative w-60 h-[22rem] sm:w-72 sm:h-[26rem] overflow-hidden"
+                animate={{
+                  rotateY: isHovering ? -5 : [0, 1.5, -1.5, 0],
+                  rotateX: isHovering ? 3 : [0, -1, 1, 0],
+                }}
+                transition={
+                  isHovering
+                    ? { duration: 0.4, ease: "easeOut" }
+                    : { repeat: Infinity, duration: 7, ease: "easeInOut" }
+                }
                 style={{ transformStyle: "preserve-3d" }}
+                whileTap={{ scale: 0.97 }}
               >
-                {/* Botanical texture overlay */}
-                <div className="absolute inset-0 opacity-[0.03] pointer-events-none"
+                {/* ── Back face shadow ── */}
+                <div
+                  className="absolute inset-0 rounded-[1.4rem] pointer-events-none"
                   style={{
-                    backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 5C22 13 14 21 14 30c0 8.8 7.2 16 16 16s16-7.2 16-16C46 21 38 13 30 5z' fill='%23000' fill-opacity='0.4'/%3E%3C/svg%3E")`,
-                    backgroundSize: "40px 40px",
+                    transform: "translateZ(-4px)",
+                    background: "hsl(var(--foreground) / 0.08)",
+                    filter: "blur(8px)",
                   }}
                 />
 
-                {/* Shine effect */}
-                <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-transparent rounded-3xl pointer-events-none" />
-
-                {/* Leaf icon */}
-                <div className="relative w-24 h-24 rounded-full bg-secondary/10 flex items-center justify-center
-                  group-hover:bg-secondary/15 transition-colors duration-300">
-                  <svg width="44" height="44" viewBox="0 0 24 24" fill="none" className="text-secondary">
-                    <path d="M12 2C8 6 4 10 4 14c0 4.4 3.6 8 8 8s8-3.6 8-8c0-4-4-8-8-12z" fill="currentColor" opacity="0.15" />
-                    <path d="M12 2C8 6 4 10 4 14c0 4.4 3.6 8 8 8s8-3.6 8-8c0-4-4-8-8-12z" stroke="currentColor" strokeWidth="1.5" fill="none" />
-                    <path d="M12 22V8" stroke="currentColor" strokeWidth="1" opacity="0.4" />
-                  </svg>
-                  {/* Floating sparkle */}
+                {/* ── Card body ── */}
+                <div
+                  className="relative w-full h-full rounded-[1.4rem] flex flex-col items-center justify-center gap-5 p-8"
+                  style={{
+                    background: `
+                      linear-gradient(170deg,
+                        hsl(var(--card)) 0%,
+                        hsl(var(--card)) 40%,
+                        hsl(var(--muted) / 0.6) 100%)
+                    `,
+                    border: "1.5px solid hsl(var(--border))",
+                    boxShadow: `
+                      0 20px 50px -12px hsl(var(--foreground) / 0.1),
+                      0 4px 16px -4px hsl(var(--foreground) / 0.06),
+                      inset 0 1px 0 hsl(0 0% 100% / 0.06)
+                    `,
+                    transform: "translateZ(0)",
+                  }}
+                >
+                  {/* Foil / holographic sheen */}
                   <motion.div
-                    className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-accent"
-                    animate={{ opacity: [0, 1, 0], scale: [0.5, 1, 0.5] }}
-                    transition={{ repeat: Infinity, duration: 2.5, ease: "easeInOut" }}
+                    className="absolute inset-0 rounded-[1.4rem] pointer-events-none"
+                    style={{
+                      background: `linear-gradient(
+                        115deg,
+                        transparent 30%,
+                        hsl(var(--secondary) / 0.06) 45%,
+                        hsl(var(--accent) / 0.08) 50%,
+                        hsl(var(--secondary) / 0.06) 55%,
+                        transparent 70%
+                      )`,
+                      backgroundSize: "200% 200%",
+                    }}
+                    animate={{
+                      backgroundPosition: isHovering
+                        ? ["0% 0%", "100% 100%"]
+                        : "0% 0%",
+                    }}
+                    transition={{ duration: 1.5, ease: "easeInOut" }}
                   />
+
+                  {/* Botanical texture */}
+                  <div
+                    className="absolute inset-0 rounded-[1.4rem] opacity-[0.025] pointer-events-none"
+                    style={{
+                      backgroundImage: `url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M40 8C28 20 16 32 16 44c0 13.2 10.8 24 24 24s24-10.8 24-24C64 32 52 20 40 8z' fill='%23000' fill-opacity='0.5'/%3E%3C/svg%3E")`,
+                      backgroundSize: "50px 50px",
+                    }}
+                  />
+
+                  {/* Top edge accent */}
+                  <div className="absolute top-0 inset-x-4 h-px bg-gradient-to-r from-transparent via-secondary/20 to-transparent" />
+
+                  {/* ── Emblem ── */}
+                  <div className="relative">
+                    <motion.div
+                      className="w-28 h-28 rounded-full flex items-center justify-center"
+                      style={{
+                        background: `radial-gradient(circle at 40% 35%, hsl(var(--secondary) / 0.15), hsl(var(--secondary) / 0.04) 70%)`,
+                        border: "1px solid hsl(var(--secondary) / 0.12)",
+                      }}
+                      animate={{ scale: isHovering ? 1.06 : 1 }}
+                      transition={{ duration: 0.4 }}
+                    >
+                      <LeafIcon size={48} className="text-secondary" />
+                    </motion.div>
+
+                    {/* Floating sparkles */}
+                    <motion.div
+                      className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-accent"
+                      animate={{ opacity: [0, 1, 0], scale: [0.4, 1.1, 0.4], y: [0, -3, 0] }}
+                      transition={{ repeat: Infinity, duration: 2.8, ease: "easeInOut" }}
+                    />
+                    <motion.div
+                      className="absolute -bottom-0.5 -left-2 w-1.5 h-1.5 rounded-full bg-secondary/60"
+                      animate={{ opacity: [0, 0.8, 0], scale: [0.5, 1, 0.5] }}
+                      transition={{ repeat: Infinity, duration: 3.2, ease: "easeInOut", delay: 1 }}
+                    />
+                  </div>
+
+                  {/* Label */}
+                  <div className="flex flex-col items-center gap-1.5">
+                    <span className="font-serif text-xl sm:text-2xl text-foreground font-bold tracking-tight">
+                      Sobre de Crecimiento
+                    </span>
+                    <span className="text-[10px] text-muted-foreground/50 font-sans uppercase tracking-[0.2em]">
+                      Verdie · Edición botánica
+                    </span>
+                  </div>
+
+                  {/* CTA */}
+                  <AnimatePresence>
+                    {isHovering && (
+                      <motion.span
+                        className="text-sm text-secondary font-sans font-medium"
+                        initial={{ opacity: 0, y: 6 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 6 }}
+                        transition={{ duration: 0.25 }}
+                      >
+                        Tocá para descubrir
+                      </motion.span>
+                    )}
+                  </AnimatePresence>
+                  {!isHovering && (
+                    <span className="text-sm text-muted-foreground font-sans">
+                      Tocá para descubrir
+                    </span>
+                  )}
+
+                  {/* Bottom ornament */}
+                  <div className="w-16 h-px bg-gradient-to-r from-transparent via-secondary/30 to-transparent" />
+
+                  {/* Bottom edge accent */}
+                  <div className="absolute bottom-0 inset-x-4 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
                 </div>
-
-                <span className="font-serif text-xl text-foreground font-semibold tracking-tight">
-                  Sobre de Crecimiento
-                </span>
-                <span className="text-sm text-muted-foreground font-sans">
-                  Tocá para descubrir
-                </span>
-
-                {/* Bottom decorative line */}
-                <div className="w-16 h-px bg-gradient-to-r from-transparent via-secondary/40 to-transparent" />
-
-                {/* Edge highlights */}
-                <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-secondary/10 to-transparent" />
               </motion.div>
-            </motion.div>
+            </div>
 
-            <p className="text-center text-sm text-muted-foreground font-sans mt-8 italic">
+            <p className="text-center text-sm text-muted-foreground font-sans mt-10 italic">
               "La suerte también florece."
             </p>
           </motion.div>
 
-          {/* Possible Rewards */}
+          {/* ──── Possible Rewards ──── */}
           <motion.div
             className="flex-1 space-y-4"
             initial={{ opacity: 0, y: 24 }}
@@ -183,9 +297,7 @@ export default function Tickets() {
                 />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-baseline justify-between gap-2">
-                    <span className="font-serif font-semibold text-foreground text-sm">
-                      {r.name}
-                    </span>
+                    <span className="font-serif font-semibold text-foreground text-sm">{r.name}</span>
                   </div>
                   <p className="text-xs text-muted-foreground font-sans mt-1 leading-relaxed">
                     {r.rewards.slice(0, 2).join(" · ")}
