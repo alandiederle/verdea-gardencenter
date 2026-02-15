@@ -5,7 +5,7 @@ import { ShoppingBag, Star, Ticket, TrendingUp, Gift, Users, ChevronRight } from
 const steps = [
   { icon: ShoppingBag, label: "Compra", desc: "Elegí tus plantas y productos", detail: "Cada compra suma puntos automáticamente. Cuanto más comprás, más rápido evolucionás." },
   { icon: Star, label: "Puntos", desc: "Sumá con cada compra", detail: "Los puntos se multiplican según tu nivel de membresía: hasta x4 en el nivel Árbol." },
-  { icon: Ticket, label: "Tickets", desc: "Coleccioná rarezas", detail: "Recibís sobres digitales con tickets de 5 categorías, desde Hoja Común hasta Pieza Botánica Única." },
+  { icon: Ticket, label: "Sobres", desc: "Descubrí recompensas", detail: "Recibís sobres digitales con recompensas de 6 rarezas botánicas, desde Natural hasta Legendaria." },
   { icon: TrendingUp, label: "Nivel", desc: "Subí de categoría", detail: "Tu nivel sube automáticamente al acumular puntos. Cada nivel desbloquea beneficios exclusivos." },
   { icon: Gift, label: "Beneficios", desc: "Canjeá premios", detail: "Usá tus puntos para canjear productos, regalos sorpresa y acceso a eventos." },
   { icon: Users, label: "Comunidad", desc: "Crecé con otros", detail: "Participá de talleres, consultá expertos y compartí tu jardín con miles de miembros." },

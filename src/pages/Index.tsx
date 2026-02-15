@@ -1,7 +1,9 @@
 import Navbar from "@/components/verdea/Navbar";
 import Hero from "@/components/verdea/Hero";
+import Collections from "@/components/verdea/Collections";
 import Problem from "@/components/verdea/Problem";
 import Ecosystem from "@/components/verdea/Ecosystem";
+import MetodoVerdie from "@/components/verdea/MetodoVerdie";
 import Tickets from "@/components/verdea/Tickets";
 import Memberships from "@/components/verdea/Memberships";
 import Catalog from "@/components/verdea/Catalog";
@@ -19,8 +21,10 @@ const Index = () => {
     <main className="min-h-screen bg-background pb-12">
       <Navbar />
       <Hero />
+      <Collections />
       <Problem />
       <Ecosystem />
+      <MetodoVerdie />
       <Tickets />
       <Memberships />
       <Catalog />
