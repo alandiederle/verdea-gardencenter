@@ -65,16 +65,14 @@ export default function OpeningOverlay({ phase, setPhase, rarity, reward, soundO
   return (
     <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black/98 backdrop-blur-3xl overflow-hidden">
 
-      {/* BOTÓN VOLVER / ESCAPE — Esquina superior derecha, siempre visible */}
-      {phase !== "idle" && (
-        <button 
-          onClick={() => { setIsCut(false); setPhase("idle"); }} 
-          className="fixed top-6 right-6 z-[120] flex items-center gap-2 px-4 py-2.5 rounded-full bg-white/10 border border-white/20 text-white hover:bg-white/20 transition-all backdrop-blur-sm"
-        >
-          <X size={18} />
-          <span className="text-xs font-bold uppercase tracking-widest">Volver</span>
-        </button>
-      )}
+      {/* BOTÓN VOLVER / ESCAPE — Esquina superior derecha */}
+      <button 
+        onClick={() => { setIsCut(false); setPhase("idle"); }} 
+        className="fixed top-6 right-6 z-[120] flex items-center gap-2 px-4 py-2.5 rounded-full bg-white/10 border border-white/20 text-white hover:bg-white/20 transition-all backdrop-blur-sm"
+      >
+        <X size={18} />
+        <span className="text-xs font-bold uppercase tracking-widest">Volver</span>
+      </button>
 
       <AnimatePresence>
         {(phase === "charging" || phase === "exploding") && (
