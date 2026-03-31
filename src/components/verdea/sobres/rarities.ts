@@ -1,10 +1,12 @@
+/* ─── 6-tier rarity system: Sobres de Cultivo ─── */
+
 export interface Rarity {
   name: string;
   chance: number;
   label: string;
-  color: string;
-  glowHsl: string;
-  textColor: string;
+  color: string;        // bg class
+  glowHsl: string;      // raw HSL for glow effects
+  textColor: string;    // text class
   tier: number;
   rewards: string[];
 }
@@ -48,7 +50,7 @@ export const rarities: Rarity[] = [
     glowHsl: "43,55%,55%",
     textColor: "text-[hsl(43,45%,20%)]",
     tier: 3,
-    rewards: ["Crédito en tienda", "Planta colección Araceae", "Box sorpresa"],
+    rewards: ["Crédito en tienda", "Planta colección Araceae", "Box sorpresa Verdie"],
   },
   {
     name: "Exótica",
@@ -58,7 +60,7 @@ export const rarities: Rarity[] = [
     glowHsl: "270,45%,70%",
     textColor: "text-[hsl(270,35%,25%)]",
     tier: 4,
-    rewards: ["Planta importada exclusiva", "Membresía Flor (1 mes)"],
+    rewards: ["Planta importada exclusiva", "Crédito alto", "Membresía Flor (1 mes)"],
   },
   {
     name: "Primordial",
@@ -68,7 +70,7 @@ export const rarities: Rarity[] = [
     glowHsl: "43,65%,60%",
     textColor: "text-[hsl(43,50%,18%)]",
     tier: 5,
-    rewards: ["Planta edición limitada", "Membresía Árbol (1 mes)"],
+    rewards: ["Planta edición limitada", "Membresía Árbol (1 mes)", "Crédito máximo"],
   },
 ];
 
