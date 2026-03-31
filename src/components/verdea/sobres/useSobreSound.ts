@@ -8,135 +8,110 @@ export function useSobreSound(enabled: boolean) {
     return ctxRef.current;
   }, []);
 
-  // Generador de Osciladores (Tonos)
-  const tone = useCallback(
-    (freq: number, dur: number, type: OscillatorType = "sine", vol = 0.1, delay = 0) => {
-      if (!enabled) return;
-      try {
-        const ctx = getCtx();
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = type;
-        osc.frequency.setValueAtTime(freq, ctx.currentTime + delay);
-        
-        gain.gain.setValueAtTime(0, ctx.currentTime + delay);
-        gain.gain.linearRampToValueAtTime(vol, ctx.currentTime + delay + 0.05);
-        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + dur);
-        
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start(ctx.currentTime + delay);
-        osc.stop(ctx.currentTime + delay + dur);
-      } catch { /* noop */ }
-    },
-    [enabled, getCtx],
-  );
-
-  // Generador de Ruido (Foil, Rasgado, Explosión)
-  const playNoise = useCallback((dur: number, vol: number, filterType: BiquadFilterType = "highpass", freq = 5000, delay = 0) => {
+  // Generador de Ruido para efectos de material (Foil/Plástico)
+  const playCrinkle = useCallback((dur: number, vol: number, freq = 6000) => {
     if (!enabled) return;
     try {
       const ctx = getCtx();
       const bufferSize = ctx.sampleRate * dur;
       const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
       const data = buffer.getChannelData(0);
+      
+      // Ruido blanco base
       for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
 
       const noise = ctx.createBufferSource();
       noise.buffer = buffer;
 
+      // Filtro Pasa-Altos (Para que suene metálico/plástico)
       const filter = ctx.createBiquadFilter();
-      filter.type = filterType;
-      filter.frequency.setValueAtTime(freq, ctx.currentTime + delay);
+      filter.type = "highpass";
+      filter.frequency.setValueAtTime(freq, ctx.currentTime);
+      filter.Q.value = 1;
 
       const gain = ctx.createGain();
-      gain.gain.setValueAtTime(vol, ctx.currentTime + delay);
-      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + delay + dur);
+      gain.gain.setValueAtTime(vol, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
 
       noise.connect(filter);
       filter.connect(gain);
       gain.connect(ctx.destination);
-      noise.start(ctx.currentTime + delay);
+      noise.start();
     } catch { /* noop */ }
   }, [enabled, getCtx]);
 
-  /* ── FASE 1: Agarrar el Sobre (Ruido Foil Metálico) ── */
+  /* ── FASE 1: Agarrar el Sobre (Pequeño crujido de plástico) ── */
   const playWindUp = useCallback(() => {
-    playNoise(0.3, 0.1, "highpass", 8000); // Rasguño de plástico rápido
-  }, [playNoise]);
+    playCrinkle(0.15, 0.1, 7000); 
+    setTimeout(() => playCrinkle(0.1, 0.05, 8000), 50);
+  }, [playCrinkle]);
 
-  /* ── FASE 2: Rasgando el Sobre (Crescendo de Tensión) ── */
+  /* ── FASE 2: EL "TRACCC" (El rasgado tipo Pokémon) ── */
   const playChargeUp = useCallback(() => {
     if (!enabled) return;
-    playNoise(1.5, 0.2, "highpass", 3000); // Rasgado de papel constante
     const ctx = getCtx();
+    
+    // El "traccc" no es un solo sonido, son varios micro-rasgados
+    for (let i = 0; i < 15; i++) {
+      const delay = i * 0.08; // Espaciado entre dientes del sobre
+      const pitch = 4000 + (i * 200); // El tono sube mientras se rasga
+      
+      setTimeout(() => {
+        playCrinkle(0.12, 0.15, pitch);
+      }, i * 80);
+    }
+
+    // Un zumbido de tensión de fondo que sube
     try {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
-      osc.type = "sawtooth";
-      osc.frequency.setValueAtTime(100, ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + 1.5); // Pitch subiendo al clímax
+      osc.type = "triangle";
+      osc.frequency.setValueAtTime(150, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(600, ctx.currentTime + 1.2);
+      
       gain.gain.setValueAtTime(0, ctx.currentTime);
-      gain.gain.linearRampToValueAtTime(0.05, ctx.currentTime + 1.2);
-      gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 1.5);
+      gain.gain.linearRampToValueAtTime(0.03, ctx.currentTime + 0.5);
+      gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 1.3);
+      
       osc.connect(gain);
       gain.connect(ctx.destination);
       osc.start();
-      osc.stop(ctx.currentTime + 1.5);
+      osc.stop(ctx.currentTime + 1.3);
     } catch {}
-  }, [enabled, getCtx, playNoise]);
+  }, [enabled, getCtx, playCrinkle]);
 
-  /* ── FASE 3: EXPLOSIÓN SEGÚN RAREZA ── */
+  /* ── FASE 3: REVELACIÓN (Explosión y música de rareza) ── */
   const playReveal = useCallback((tier: number) => {
     if (!enabled) return;
-    
-    // El Impacto (Común a todos, pero varía en potencia)
-    const impactVol = 0.4 + (tier * 0.1);
-    playNoise(1.2, impactVol, "lowpass", 800); // BOOM sordo
+    const ctx = getCtx();
 
-    switch (tier) {
-      case 0: // Silvestre (Natural) - Simple y orgánico
-        tone(440, 0.8, "sine", 0.1);
-        setTimeout(() => tone(660, 0.5, "sine", 0.08), 100);
-        break;
+    // Impacto sordo (BOOM)
+    playCrinkle(1.5, 0.5, 500); 
 
-      case 1: // Brote (Vital) - Crecimiento ascendente
-        tone(220, 1.0, "triangle", 0.1);
-        tone(440, 1.0, "sine", 0.1, 0.1);
-        tone(880, 1.0, "sine", 0.1, 0.2);
-        break;
+    // Función auxiliar para notas musicales
+    const tone = (f: number, d: number, v: number, del: number) => {
+      const osc = ctx.createOscillator();
+      const g = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(f, ctx.currentTime + del);
+      g.gain.setValueAtTime(0, ctx.currentTime + del);
+      g.gain.linearRampToValueAtTime(v, ctx.currentTime + del + 0.05);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + del + d);
+      osc.connect(g);
+      g.connect(ctx.destination);
+      osc.start(ctx.currentTime + del);
+      osc.stop(ctx.currentTime + del + d);
+    };
 
-      case 2: // Polen (Floral) - Shimmer y brillo
-        playNoise(1.5, 0.15, "highpass", 10000); // Brillo de hadas
-        tone(523.25, 1.2, "sine", 0.12, 0.1);
-        tone(783.99, 1.2, "sine", 0.1, 0.2);
-        tone(1046.50, 1.5, "sine", 0.08, 0.3);
-        break;
-
-      case 3: // Raíz (Ancestral) - Profundidad de tierra y campana
-        tone(110, 2.0, "sine", 0.3); // Bajo profundo
-        tone(330, 1.5, "triangle", 0.15, 0.1);
-        tone(554, 1.5, "sine", 0.1, 0.2);
-        break;
-
-      case 4: // Exótica (Mítica) - Cestial y místico
-        playNoise(2.0, 0.1, "highpass", 12000, 0.2);
-        tone(523, 2.0, "sine", 0.15, 0);
-        tone(659, 2.0, "sine", 0.15, 0.15);
-        tone(783, 2.0, "sine", 0.15, 0.30);
-        tone(1046, 2.5, "sine", 0.1, 0.45);
-        break;
-
-      case 5: // Primordial (Legendaria) - EL GRAN EVENTO
-        playNoise(3.0, 0.8, "lowpass", 400); // Bass Drop masivo
-        playNoise(2.5, 0.2, "highpass", 15000); // Sparkles divinos
-        // Acorde Mayor Completo (Celestial)
-        [261, 329, 392, 523, 659, 1046].forEach((f, i) => {
-          tone(f, 4.0, "sine", 0.15, i * 0.1);
-        });
-        break;
+    // Melodía por Rareza
+    if (tier === 5) { // Primordial (Legendaria)
+      [523, 659, 784, 1046].forEach((f, i) => tone(f, 3, 0.2, i * 0.15));
+    } else if (tier >= 3) { // Raíz / Exótica
+      [440, 554, 659].forEach((f, i) => tone(f, 2, 0.15, i * 0.2));
+    } else { // Comunes
+      tone(880, 1, 0.1, 0);
     }
-  }, [enabled, playNoise, tone]);
+  }, [enabled, getCtx, playCrinkle]);
 
   return { playWindUp, playChargeUp, playReveal };
 }
