@@ -38,20 +38,16 @@ export default function OpeningOverlay({ phase, setPhase, rarity, reward, soundO
     return () => window.removeEventListener("keydown", handleEscape);
   }, [phase, setPhase]);
 
-  if (phase === "idle") return null;
-
   // FUNCIÓN CLAVE: Gesto de corte (arrastre) con un solo clic
   const handleDrag = useCallback((event: any, info: any) => {
     if (isCut || phase !== "charging") return;
 
-    // Calculamos la magnitud del movimiento (velocidad)
     const velocity = Math.abs(info.velocity.x) + Math.abs(info.velocity.y);
     const offsetMagnitude = Math.abs(info.offset.x) + Math.abs(info.offset.y);
 
-    // LÓGICA DE DETECCION DEL CORTE FINAL
     if (velocity > 350 && offsetMagnitude > 120) {
       setIsCut(true);
-      sound.playReveal(rarity.tier); // AQÜÍ SUENA TU SONIDO DE EXPLOSIÓN SEGÚN RAREZA
+      sound.playReveal(rarity.tier);
 
       setPhase("exploding");
       
@@ -63,6 +59,8 @@ export default function OpeningOverlay({ phase, setPhase, rarity, reward, soundO
   }, [isCut, phase, sound, setPhase, rarity, reward, addDiscovery]);
 
   const glowColor = `hsl(${rarity?.glowHsl || '140, 50%, 50%'})`;
+
+  if (phase === "idle") return null;
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/98 backdrop-blur-3xl overflow-hidden">
