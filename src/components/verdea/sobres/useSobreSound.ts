@@ -8,7 +8,6 @@ export function useSobreSound(enabled: boolean) {
     return ctxRef.current;
   }, []);
 
-  // Función base para tonos (mantenemos la tuya para melodías)
   const tone = useCallback(
     (freq: number, dur: number, type: OscillatorType = "sine", vol = 0.08, detune = 0) => {
       if (!enabled) return;
@@ -31,7 +30,6 @@ export function useSobreSound(enabled: boolean) {
     [enabled, getCtx],
   );
 
-  // NUEVO: Generador de ruido para plástico/foil y explosiones
   const playNoise = useCallback((dur: number, vol: number, isHighPitch: boolean = false) => {
     if (!enabled) return;
     try {
@@ -40,13 +38,12 @@ export function useSobreSound(enabled: boolean) {
       const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
       const data = buffer.getChannelData(0);
       for (let i = 0; i < bufferSize; i++) {
-        data[i] = Math.random() * 2 - 1; // Ruido blanco
+        data[i] = Math.random() * 2 - 1; 
       }
       
       const noise = ctx.createBufferSource();
       noise.buffer = buffer;
       
-      // Filtro para que suene a "rasgado" o "impacto"
       const filter = ctx.createBiquadFilter();
       filter.type = isHighPitch ? "highpass" : "lowpass";
       filter.frequency.value = isHighPitch ? 5000 : 1000;
@@ -62,16 +59,13 @@ export function useSobreSound(enabled: boolean) {
     } catch { /* noop */ }
   }, [enabled, getCtx]);
 
-  /* Fase 1 – Agarrar el sobre (Sonido de plástico Foil) */
   const playWindUp = useCallback(() => {
-    playNoise(0.4, 0.15, true); // Sonido de plástico arrugándose
+    playNoise(0.4, 0.15, true); 
   }, [playNoise]);
 
-  /* Fase 2 – Abriendo / Rasgando el sobre */
   const playChargeUp = useCallback(() => {
     if (!enabled) return;
-    playNoise(1.2, 0.3, true); // Sonido de rasgado largo
-    // Tensión subiendo
+    playNoise(1.2, 0.3, true); 
     const ctx = getCtx();
     try {
       const osc = ctx.createOscillator();
@@ -89,20 +83,18 @@ export function useSobreSound(enabled: boolean) {
     } catch { /* noop */ }
   }, [enabled, getCtx, playNoise]);
 
-  /* Fase 3 – EXPLOSIÓN ÉPICA y revelación */
   const playReveal = useCallback(
     (tier: number) => {
       if (!enabled) return;
       
-      // IMPACTO PESADO (Bass Drop + Ruido de explosión)
-      playNoise(1.5, 0.8, false); // BOOM profundo
+      playNoise(1.5, 0.8, false); 
       const ctx = getCtx();
       try {
          const osc = ctx.createOscillator();
          const gain = ctx.createGain();
          osc.type = "sine";
          osc.frequency.setValueAtTime(150, ctx.currentTime);
-         osc.frequency.exponentialRampToValueAtTime(20, ctx.currentTime + 1); // Drop de graves
+         osc.frequency.exponentialRampToValueAtTime(20, ctx.currentTime + 1); 
          gain.gain.setValueAtTime(1, ctx.currentTime);
          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 1.5);
          osc.connect(gain);
@@ -111,12 +103,11 @@ export function useSobreSound(enabled: boolean) {
          osc.stop(ctx.currentTime + 1.5);
       } catch {}
 
-      // Melodía celestial según la rareza (mantenemos la lógica pero con más volumen)
       setTimeout(() => {
         if (tier >= 4) {
-          tone(523, 1.5, "sine", 0.2); // Nota muy brillante
+          tone(523, 1.5, "sine", 0.2); 
           setTimeout(() => tone(659, 1.5, "sine", 0.2), 150);
-          setTimeout(() => tone(1046, 3.0, "sine", 0.3), 300); // Clímax Legendario
+          setTimeout(() => tone(1046, 3.0, "sine", 0.3), 300); 
         } else if (tier >= 2) {
           tone(523, 0.8, "triangle", 0.15);
           setTimeout(() => tone(784, 1.2, "sine", 0.2), 200);
