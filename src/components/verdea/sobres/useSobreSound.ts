@@ -8,6 +8,7 @@ export function useSobreSound(enabled: boolean) {
     return ctxRef.current;
   }, []);
 
+  // Función base para tonos (mantenemos la tuya para melodías)
   const tone = useCallback(
     (freq: number, dur: number, type: OscillatorType = "sine", vol = 0.08, detune = 0) => {
       if (!enabled) return;
@@ -30,82 +31,101 @@ export function useSobreSound(enabled: boolean) {
     [enabled, getCtx],
   );
 
-  /* Phase 1 – wind / leaves rustle */
-  const playWindUp = useCallback(() => {
+  // NUEVO: Generador de ruido para plástico/foil y explosiones
+  const playNoise = useCallback((dur: number, vol: number, isHighPitch: boolean = false) => {
     if (!enabled) return;
     try {
       const ctx = getCtx();
-      const len = ctx.sampleRate * 0.6;
-      const buf = ctx.createBuffer(1, len, ctx.sampleRate);
-      const d = buf.getChannelData(0);
-      for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (len * 0.4)) * 0.03;
-      const src = ctx.createBufferSource();
-      src.buffer = buf;
-      const f = ctx.createBiquadFilter();
-      f.type = "bandpass";
-      f.frequency.value = 1800;
-      f.Q.value = 0.4;
-      src.connect(f);
-      f.connect(ctx.destination);
-      src.start();
+      const bufferSize = ctx.sampleRate * dur;
+      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = Math.random() * 2 - 1; // Ruido blanco
+      }
+      
+      const noise = ctx.createBufferSource();
+      noise.buffer = buffer;
+      
+      // Filtro para que suene a "rasgado" o "impacto"
+      const filter = ctx.createBiquadFilter();
+      filter.type = isHighPitch ? "highpass" : "lowpass";
+      filter.frequency.value = isHighPitch ? 5000 : 1000;
+
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(vol, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + dur);
+
+      noise.connect(filter);
+      filter.connect(gain);
+      gain.connect(ctx.destination);
+      noise.start();
     } catch { /* noop */ }
   }, [enabled, getCtx]);
 
-  /* Phase 2 – rising energy hum */
+  /* Fase 1 – Agarrar el sobre (Sonido de plástico Foil) */
+  const playWindUp = useCallback(() => {
+    playNoise(0.4, 0.15, true); // Sonido de plástico arrugándose
+  }, [playNoise]);
+
+  /* Fase 2 – Abriendo / Rasgando el sobre */
   const playChargeUp = useCallback(() => {
     if (!enabled) return;
+    playNoise(1.2, 0.3, true); // Sonido de rasgado largo
+    // Tensión subiendo
+    const ctx = getCtx();
     try {
-      const ctx = getCtx();
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
-      osc.type = "sine";
-      osc.frequency.setValueAtTime(180, ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(600, ctx.currentTime + 1.8);
+      osc.type = "sawtooth";
+      osc.frequency.setValueAtTime(100, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 1.2);
       gain.gain.setValueAtTime(0, ctx.currentTime);
-      gain.gain.linearRampToValueAtTime(0.04, ctx.currentTime + 0.3);
-      gain.gain.linearRampToValueAtTime(0.06, ctx.currentTime + 1.5);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 2);
+      gain.gain.linearRampToValueAtTime(0.1, ctx.currentTime + 1);
+      gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 1.2);
       osc.connect(gain);
       gain.connect(ctx.destination);
-      osc.start(ctx.currentTime);
-      osc.stop(ctx.currentTime + 2);
+      osc.start();
+      osc.stop(ctx.currentTime + 1.2);
     } catch { /* noop */ }
-  }, [enabled, getCtx]);
+  }, [enabled, getCtx, playNoise]);
 
-  /* Phase 3 – reveal per tier */
+  /* Fase 3 – EXPLOSIÓN ÉPICA y revelación */
   const playReveal = useCallback(
     (tier: number) => {
       if (!enabled) return;
-      if (tier <= 1) {
-        tone(800, 0.6, "sine", 0.05);
-        setTimeout(() => tone(1000, 0.4, "sine", 0.03), 150);
-      } else if (tier === 2) {
-        tone(523, 0.8, "sine", 0.06);
-        setTimeout(() => tone(659, 0.6, "sine", 0.05), 200);
-        setTimeout(() => tone(784, 0.5, "sine", 0.04), 400);
-      } else if (tier === 3) {
-        tone(261, 1.0, "triangle", 0.07);
-        setTimeout(() => tone(392, 0.8, "sine", 0.05), 300);
-        setTimeout(() => tone(523, 0.6, "sine", 0.04), 600);
-      } else if (tier === 4) {
-        // Mítica – resonancia brillante
-        tone(523, 1.2, "sine", 0.06);
-        setTimeout(() => tone(659, 1.0, "sine", 0.06), 200);
-        setTimeout(() => tone(784, 0.8, "sine", 0.07), 400);
-        setTimeout(() => tone(1046, 0.6, "sine", 0.05), 600);
-      } else {
-        // Legendaria – impacto luminoso + eco
-        tone(261, 1.5, "sine", 0.06);
-        setTimeout(() => tone(329, 1.2, "sine", 0.06), 200);
-        setTimeout(() => tone(392, 1.0, "sine", 0.07), 400);
-        setTimeout(() => tone(523, 0.8, "sine", 0.08), 600);
-        setTimeout(() => {
-          tone(1046, 1.5, "sine", 0.04);
-          tone(1568, 1.2, "sine", 0.02, 5);
-        }, 800);
-      }
+      
+      // IMPACTO PESADO (Bass Drop + Ruido de explosión)
+      playNoise(1.5, 0.8, false); // BOOM profundo
+      const ctx = getCtx();
+      try {
+         const osc = ctx.createOscillator();
+         const gain = ctx.createGain();
+         osc.type = "sine";
+         osc.frequency.setValueAtTime(150, ctx.currentTime);
+         osc.frequency.exponentialRampToValueAtTime(20, ctx.currentTime + 1); // Drop de graves
+         gain.gain.setValueAtTime(1, ctx.currentTime);
+         gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 1.5);
+         osc.connect(gain);
+         gain.connect(ctx.destination);
+         osc.start();
+         osc.stop(ctx.currentTime + 1.5);
+      } catch {}
+
+      // Melodía celestial según la rareza (mantenemos la lógica pero con más volumen)
+      setTimeout(() => {
+        if (tier >= 4) {
+          tone(523, 1.5, "sine", 0.2); // Nota muy brillante
+          setTimeout(() => tone(659, 1.5, "sine", 0.2), 150);
+          setTimeout(() => tone(1046, 3.0, "sine", 0.3), 300); // Clímax Legendario
+        } else if (tier >= 2) {
+          tone(523, 0.8, "triangle", 0.15);
+          setTimeout(() => tone(784, 1.2, "sine", 0.2), 200);
+        } else {
+          tone(800, 0.8, "sine", 0.1);
+        }
+      }, 100);
     },
-    [enabled, tone],
+    [enabled, getCtx, playNoise, tone]
   );
 
   return { playWindUp, playChargeUp, playReveal };
