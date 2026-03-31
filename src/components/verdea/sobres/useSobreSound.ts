@@ -6,14 +6,13 @@ export function useSobreSound(enabled: boolean) {
     try {
       const audio = new Audio(`/sounds/${fileName}`);
       audio.volume = volume;
-      audio.play().catch(e => console.warn("Audio bloqueado o no encontrado:", fileName));
+      audio.play().catch(e => console.warn("Error audio:", fileName));
     } catch (err) {
-      console.error("Error de audio:", err);
+      console.error(err);
     }
   }, [enabled]);
 
   return {
-    // Agarre es .wav, el resto .mp3
     playWindUp: () => playFile("agarre.mp3", 0.4), 
     playChargeUp: () => playFile("abrir.mp3", 0.8),
     playReveal: (tier: number) => {
