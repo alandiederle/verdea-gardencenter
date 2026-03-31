@@ -145,16 +145,56 @@ export default function OpeningOverlay({ phase, rarity, reward, onClose }: Props
         />
 
         <div className="relative z-10 flex flex-col items-center">
-          {phase === "charging" && (
+      {phase === "charging" && (
             <motion.div
-              className="relative w-64 h-80"
-              style={{ perspective: "1000px" }}
+              className="relative w-64 h-96 flex flex-col items-center justify-center cursor-pointer"
+              style={{ perspective: "1500px" }}
               animate={{ 
-                scale: [1, 0.94, 1.05],
-                rotateZ: [0, -1, 1, 0],
-                boxShadow: [`0 0 20px ${glowColor}22`, `0 0 80px ${glowColor}66`]
+                scale: [1, 0.9, 1.05], // Se achica fuerte como si tomaras impulso para rasgarlo
+                rotateZ: [0, -3, 3, -1, 0],
+                rotateY: [-15, 15, -15], // Rotación 3D intensa
+                filter: ["brightness(1)", "brightness(1.5)", "brightness(2)"]
               }}
-              transition={{ duration: 0.2, repeat: Infinity, repeatType: "reverse" }}
+              transition={{ duration: 0.15, repeat: Infinity, repeatType: "reverse" }}
+            >
+              {/* Sombra proyectada masiva */}
+              <div className="absolute -bottom-10 w-48 h-10 bg-black/60 blur-2xl rounded-full" />
+
+              {/* El Sobre Foil */}
+              <div className="w-full h-full relative rounded-xl border border-white/40 shadow-2xl overflow-hidden bg-gradient-to-b from-zinc-800 via-zinc-900 to-black">
+                
+                {/* Borde Superior Sellado (Crimped Edge) */}
+                <div className="absolute top-0 w-full h-6 bg-gradient-to-r from-zinc-600 via-zinc-400 to-zinc-600 opacity-80" 
+                     style={{ backgroundImage: 'repeating-linear-gradient(90deg, transparent, transparent 4px, rgba(0,0,0,0.4) 4px, rgba(0,0,0,0.4) 8px)' }} />
+                     
+                {/* Textura Foil / Holográfica animada */}
+                <motion.div 
+                  className="absolute inset-0 opacity-40 mix-blend-overlay"
+                  style={{ background: `linear-gradient(125deg, transparent 0%, ${glowColor} 40%, white 50%, ${glowColor} 60%, transparent 100%)`, backgroundSize: '300% 300%' }}
+                  animate={{ backgroundPosition: ["0% 0%", "100% 100%", "0% 0%"] }}
+                  transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+                />
+
+                {/* Centro Brillante */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <motion.div
+                    className="w-32 h-32 rounded-full blur-2xl"
+                    style={{ background: glowColor }}
+                    animate={{ scale: [1, 2], opacity: [0.5, 1] }}
+                    transition={{ repeat: Infinity, duration: 0.4, repeatType: "reverse" }}
+                  />
+                  {/* Etiqueta Verdie Central */}
+                  <div className="z-10 font-serif text-3xl font-bold text-white tracking-widest drop-shadow-lg border-y border-white/30 py-4 w-full text-center bg-black/20 backdrop-blur-md">
+                    VERDIE
+                  </div>
+                </div>
+
+                {/* Borde Inferior Sellado (Crimped Edge) */}
+                <div className="absolute bottom-0 w-full h-6 bg-gradient-to-r from-zinc-600 via-zinc-400 to-zinc-600 opacity-80" 
+                     style={{ backgroundImage: 'repeating-linear-gradient(90deg, transparent, transparent 4px, rgba(0,0,0,0.4) 4px, rgba(0,0,0,0.4) 8px)' }} />
+              </div>
+            </motion.div>
+          )}
             >
               <div className="w-full h-full rounded-[2rem] border-2 border-white/20 bg-gradient-to-br from-white/10 to-transparent backdrop-blur-sm flex items-center justify-center">
                  <motion.div
