@@ -63,122 +63,116 @@ export default function OpeningOverlay({ phase, setPhase, rarity, reward, soundO
   if (phase === "idle") return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/98 backdrop-blur-3xl overflow-hidden">
+    <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black/98 backdrop-blur-3xl overflow-hidden">
+
+      {/* BOTÓN VOLVER / ESCAPE — Esquina superior derecha, siempre visible */}
+      {phase !== "idle" && (
+        <button 
+          onClick={() => { setIsCut(false); setPhase("idle"); }} 
+          className="fixed top-6 right-6 z-[120] flex items-center gap-2 px-4 py-2.5 rounded-full bg-white/10 border border-white/20 text-white hover:bg-white/20 transition-all backdrop-blur-sm"
+        >
+          <X size={18} />
+          <span className="text-xs font-bold uppercase tracking-widest">Volver</span>
+        </button>
+      )}
+
       <AnimatePresence>
         {(phase === "charging" || phase === "exploding") && (
-          <div className="relative w-80 aspect-[2/3]">
-            
-            {/* 1. GUÍA VISUAL INTENSIVA: Flecha, Guía Verde y Texto (Estilo image_16.png) */}
+          <div className="relative flex flex-col items-center">
+
+            {/* Encabezado: "RITUAL DE APERTURA" — bien arriba, separado */}
+            <motion.p 
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-white/70 font-serif text-lg font-bold tracking-[0.3em] uppercase mb-12"
+            >
+              Ritual de Apertura
+            </motion.p>
+
+            {/* Contenedor del sobre */}
+            <div className="relative w-80 aspect-[2/3]">
+
+              {/* EL SOBRE: Dividido en dos piezas con física de corte */}
+              <motion.div
+                ref={sobreRef}
+                className="relative w-full h-full cursor-grab active:cursor-grabbing"
+                style={{ perspective: "1500px", rotateX, rotateY, transformStyle: "preserve-3d" }}
+                drag={phase === "charging" && !isCut}
+                dragConstraints={sobreRef}
+                dragElastic={0.06}
+                onDrag={handleDrag}
+                onDragStart={() => sound.playWindUp()}
+              >
+                {/* PIEZA DE ARRIBA (La que sale volando) */}
+                <motion.div
+                  className="absolute inset-0 z-30 pointer-events-none"
+                  style={{ clipPath: "inset(0 0 88% 0)", x: isCut ? 150 : 0 }}
+                  animate={isCut ? { y: -500, rotate: 55, opacity: 0 } : { y: 0 }}
+                  transition={{ type: "spring", stiffness: 40 }}
+                >
+                  <img src="/images/sobre-verdie.png" className="w-full h-full object-contain" alt="" />
+                </motion.div>
+
+                {/* PIEZA DE ABAJO (La que se queda) */}
+                <motion.div
+                  className="absolute inset-0 z-20 pointer-events-none"
+                  style={{ clipPath: "inset(12% 0 0 0)" }}
+                  animate={isCut ? { y: 25, scale: 0.96, filter: 'blur(2px)' } : { y: 0 }}
+                >
+                  <img src="/images/sobre-verdie.png" className="w-full h-full object-contain" alt="" />
+                </motion.div>
+
+                {/* EFECTO DE LUCES (Según Rareza) Detrás del sobre */}
+                {isCut && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.6 }}
+                    animate={{ opacity: [0, 1, 0.4], scale: [1, 2.2, 2.8] }}
+                    transition={{ duration: 1.2, delay: 0.1 }}
+                    className="absolute inset-0 -z-10 blur-[120px] rounded-full pointer-events-none"
+                    style={{ backgroundColor: glowColor }}
+                  />
+                )}
+              </motion.div>
+
+              {/* Partículas de luz emergiendo del corte */}
+              {isCut && (
+                <motion.div 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1, boxShadow: `0 -10px 100px 30px ${glowColor}` }}
+                  className="absolute top-[12%] left-1/2 -translate-x-1/2 w-full h-3 shadow-lg z-40 pointer-events-none"
+                  style={{ color: glowColor }}
+                />
+              )}
+            </div>
+
+            {/* GUÍA VISUAL: Línea de corte + flecha + texto — DEBAJO del sobre */}
             {!isCut && phase === "charging" && (
               <motion.div 
                 style={{ opacity: guideOpacity }}
-                className="absolute -top-32 inset-x-0 z-50 flex flex-col items-center pointer-events-none"
+                className="mt-6 flex flex-col items-center pointer-events-none z-50"
               >
-                {/* Flecha apuntando a la línea verde */}
+                {/* Línea de corte verde grande y visible */}
                 <motion.div 
-                  animate={{ y: [0, -6, 0] }}
+                  className="w-80 h-1 rounded-full bg-secondary shadow-[0_0_20px_hsl(var(--secondary)),0_0_40px_hsl(var(--secondary)/0.4)]" 
+                  animate={{ opacity: [0.7, 1, 0.7] }}
+                  transition={{ repeat: Infinity, duration: 1.5 }}
+                />
+
+                {/* Flecha apuntando ABAJO hacia la línea */}
+                <motion.div 
+                  animate={{ y: [0, 6, 0] }}
                   transition={{ repeat: Infinity, duration: 1.2, ease: "easeInOut" }}
-                  className="text-secondary"
+                  className="text-secondary mt-3"
                 >
-                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M7 11l5-5 5 5M12 6v12" />
+                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 5v14M19 12l-7 7-7-7" />
                   </svg>
                 </motion.div>
-                
-                <p className="text-white font-black text-xs uppercase tracking-[0.25em] bg-black/60 px-5 py-2 rounded-full border border-white/10 shadow-lg">
-                  Corta aquí para abrir
+
+                <p className="mt-2 text-secondary font-black text-sm uppercase tracking-[0.2em]">
+                  Arrastrá para cortar
                 </p>
-                
-                {/* Línea de termosellado visual VERDE OSCURO BRILLANTE */}
-                <motion.div 
-                  className="w-72 h-px bg-verde-oscuro mt-14 border-t border-dashed border-verde-oscuro/50 shadow-[0_0_15px_hsl(160,30%,20%)]" 
-                  animate={{ opacity: [0.6, 1, 0.6] }}
-                  transition={{ repeat: Infinity, duration: 2 }}
-                />
               </motion.div>
-            )}
-
-            {/* BOTÓN VOLVER / ESCAPE (Esquina superior derecha) */}
-            {(phase === "charging" || phase === "exploding") && (
-              <button 
-                onClick={() => { setIsCut(false); setPhase("idle"); }} 
-                className="absolute top-10 right-10 z-[110] flex items-center gap-2 p-3 rounded-full text-white hover:text-secondary hover:bg-white/10 transition-all shadow-xl"
-              >
-                <X size={24} />
-                <span className="text-xs font-bold uppercase tracking-widest">Esc para Volver</span>
-              </button>
-            )}
-
-            {/* Encabezado: Texto "RITUAL DE APERTURA" */}
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="absolute -top-16 inset-x-0 z-50 text-center w-full"
-            >
-              <p className="text-white font-serif text-2xl font-bold tracking-widest uppercase mb-2 shadow-lg">
-                Ritual de Apertura
-              </p>
-            </motion.div>
-            
-            {/* 2. EL SOBRE: Dividido en dos piezas con física de corte */}
-            <motion.div
-              ref={sobreRef}
-              className="relative w-full h-full cursor-grab active:cursor-grabbing"
-              style={{ perspective: "1500px", rotateX, rotateY, transformStyle: "preserve-3d" }}
-              
-              // GESTOS DE ARRASTRE (Corte) con un solo clic
-              drag={phase === "charging" && !isCut}
-              dragConstraints={sobreRef}
-              dragElastic={0.06} // Pequeña elasticidad
-              onDrag={handleDrag} // Dispara sonido granular y detección
-              onDragStart={() => sound.playWindUp()}
-            >
-              {/* PIEZA DE ARRIBA (La que sale volando) */}
-              <motion.div
-                className="absolute inset-0 z-30 pointer-events-none"
-                style={{ 
-                  clipPath: "inset(0 0 88% 0)", // Solo muestra el 12% superior
-                  x: isCut ? 150 : 0
-                }}
-                animate={isCut ? { 
-                  y: -500, 
-                  rotate: 55, 
-                  opacity: 0 
-                } : { y: 0 }}
-                transition={{ type: "spring", stiffness: 40 }}
-              >
-                <img src="/images/sobre-verdie.png" className="w-full h-full object-contain" alt="" />
-              </motion.div>
-
-              {/* PIEZA DE ABAJO (La que se queda) */}
-              <motion.div
-                className="absolute inset-0 z-20 pointer-events-none"
-                style={{ clipPath: "inset(12% 0 0 0)" }} // Muestra el resto del sobre
-                animate={isCut ? { y: 25, scale: 0.96, filter: 'blur(2px)' } : { y: 0 }}
-              >
-                <img src="/images/sobre-verdie.png" className="w-full h-full object-contain" alt="" />
-              </motion.div>
-
-              {/* 3. EFECTO DE LUCES (Según Rareza) Detrás del sobre */}
-              {isCut && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.6 }}
-                  animate={{ opacity: [0, 1, 0.4], scale: [1, 2.2, 2.8] }}
-                  transition={{ duration: 1.2, delay: 0.1 }}
-                  className="absolute inset-0 -z-10 blur-[120px] rounded-full pointer-events-none"
-                  style={{ backgroundColor: glowColor }}
-                />
-              )}
-            </motion.div>
-
-            {/* Partículas de luz emergiendo del corte */}
-            {isCut && (
-              <motion.div 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1, boxShadow: `0 -10px 100px 30px ${glowColor}` }}
-                className="absolute top-[12%] left-1/2 -translate-x-1/2 w-full h-3 shadow-lg z-40 pointer-events-none"
-                style={{ color: glowColor }}
-              />
             )}
           </div>
         )}
