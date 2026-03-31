@@ -101,7 +101,7 @@ export default function OpeningOverlay({ phase, setPhase, rarity, reward, soundO
             )}
 
             {/* BOTÓN VOLVER / ESCAPE (Esquina superior derecha) */}
-            {(phase === "charging" || phase === "revealed") && (
+            {(phase === "charging" || phase === "exploding") && (
               <button 
                 onClick={() => { setIsCut(false); setPhase("idle"); }} 
                 className="absolute top-10 right-10 z-[110] flex items-center gap-2 p-3 rounded-full text-white hover:text-secondary hover:bg-white/10 transition-all shadow-xl"
