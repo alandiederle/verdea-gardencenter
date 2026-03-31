@@ -6,25 +6,20 @@ export function useSobreSound(enabled: boolean) {
     try {
       const audio = new Audio(`/sounds/${fileName}`);
       audio.volume = volume;
-      audio.play().catch(e => console.warn("Error cargando sonido:", fileName, e));
+      audio.play().catch(e => console.warn("Audio bloqueado o no encontrado:", fileName));
     } catch (err) {
       console.error("Error de audio:", err);
     }
   }, [enabled]);
 
   return {
-    // Configuramos .wav para el agarre y .mp3 para el resto
+    // Agarre es .wav, el resto .mp3
     playWindUp: () => playFile("agarre.wav", 0.4), 
-    playChargeUp: () => playFile("abrir.mp3", 0.8), // El "traccc"
+    playChargeUp: () => playFile("abrir.mp3", 0.8),
     playReveal: (tier: number) => {
-      // Lógica de rareza vinculada a tus archivos
-      if (tier >= 4) {
-        playFile("legendario.mp3", 0.9); // Exótica y Primordial
-      } else if (tier >= 2) {
-        playFile("raro.mp3", 0.7);       // Polen y Raíz
-      } else {
-        playFile("comun.mp3", 0.5);      // Silvestre y Brote
-      }
+      if (tier >= 4) playFile("legendario.mp3", 0.9);
+      else if (tier >= 2) playFile("raro.mp3", 0.7);
+      else playFile("comun.mp3", 0.5);
     }
   };
 }
