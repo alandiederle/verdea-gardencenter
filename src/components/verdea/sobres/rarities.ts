@@ -1,77 +1,21 @@
-/* ─── 6-tier rarity system: Sobres de Cultivo ─── */
-
 export interface Rarity {
   name: string;
   chance: number;
   label: string;
-  color: string;        // bg class
-  glowHsl: string;      // raw HSL for glow effects
-  textColor: string;    // text class
+  color: string;
+  glowHsl: string;
+  textColor: string;
   tier: number;
   rewards: string[];
 }
 
 export const rarities: Rarity[] = [
-  {
-    name: "Silvestre",
-    chance: 45,
-    label: "45 %",
-    color: "bg-[hsl(140,22%,90%)]",
-    glowHsl: "140,25%,65%",
-    textColor: "text-[hsl(150,30%,22%)]",
-    tier: 0,
-    rewards: ["Puntos extra", "Multiplicador temporal ×2", "Descuento 5 %"],
-  },
-  {
-    name: "Brote",
-    chance: 30,
-    label: "30 %",
-    color: "bg-[hsl(147,35%,85%)]",
-    glowHsl: "147,40%,50%",
-    textColor: "text-[hsl(147,42%,18%)]",
-    tier: 1,
-    rewards: ["Maceta gratis", "Envío bonificado", "Planta sorpresa pequeña"],
-  },
-  {
-    name: "Polen",
-    chance: 15,
-    label: "15 %",
-    color: "bg-[hsl(340,32%,90%)]",
-    glowHsl: "340,45%,65%",
-    textColor: "text-[hsl(340,38%,28%)]",
-    tier: 2,
-    rewards: ["Planta premium", "Descuento 25 %", "Taller online"],
-  },
-  {
-    name: "Raíz",
-    chance: 8,
-    label: "8 %",
-    color: "bg-[hsl(43,40%,88%)]",
-    glowHsl: "43,55%,55%",
-    textColor: "text-[hsl(43,45%,20%)]",
-    tier: 3,
-    rewards: ["Crédito en tienda", "Planta colección Araceae", "Box sorpresa Verdie"],
-  },
-  {
-    name: "Exótica",
-    chance: 2,
-    label: "2 %",
-    color: "bg-[hsl(270,30%,92%)]",
-    glowHsl: "270,45%,70%",
-    textColor: "text-[hsl(270,35%,25%)]",
-    tier: 4,
-    rewards: ["Planta importada exclusiva", "Crédito alto", "Membresía Flor (1 mes)"],
-  },
-  {
-    name: "Primordial",
-    chance: 0.5,
-    label: "0.5 %",
-    color: "bg-[hsl(43,50%,92%)]",
-    glowHsl: "43,65%,60%",
-    textColor: "text-[hsl(43,50%,18%)]",
-    tier: 5,
-    rewards: ["Planta edición limitada", "Membresía Árbol (1 mes)", "Crédito máximo"],
-  },
+  { name: "Silvestre", chance: 45, label: "45 %", color: "bg-[#f0f9f4]", glowHsl: "140,25%,65%", textColor: "text-[#1a3a2a]", tier: 0, rewards: ["Puntos extra", "Multiplicador ×2", "Descuento 5%"] },
+  { name: "Brote", chance: 30, label: "30 %", color: "bg-[#ecfdf5]", glowHsl: "147,40%,50%", textColor: "text-[#064e3b]", tier: 1, rewards: ["Maceta gratis", "Envío bonificado", "Planta sorpresa"] },
+  { name: "Polen", chance: 15, label: "15 %", color: "bg-[#fff1f2]", glowHsl: "340,45%,65%", textColor: "text-[#4c0519]", tier: 2, rewards: ["Planta premium", "Descuento 25%", "Taller online"] },
+  { name: "Raíz", chance: 8, label: "8 %", color: "bg-[#fffbeb]", glowHsl: "43,55%,55%", textColor: "text-[#451a03]", tier: 3, rewards: ["Crédito en tienda", "Alocasia Rara", "Box Verdie"] },
+  { name: "Exótica", chance: 2, label: "2 %", color: "bg-[#f5f3ff]", glowHsl: "270,45%,70%", textColor: "text-[#2e1065]", tier: 4, rewards: ["Planta importada", "Membresía Flor"] },
+  { name: "Primordial", chance: 0.5, label: "0.5 %", color: "bg-[#fff9eb]", glowHsl: "43,65%,60%", textColor: "text-[#451a03]", tier: 5, rewards: ["Edición Limitada", "Membresía Árbol"] },
 ];
 
 export function rollRarity(): number {
