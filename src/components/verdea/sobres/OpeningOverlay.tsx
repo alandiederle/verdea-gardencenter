@@ -195,18 +195,6 @@ export default function OpeningOverlay({ phase, rarity, reward, onClose }: Props
               </div>
             </motion.div>
           )}
-            >
-              <div className="w-full h-full rounded-[2rem] border-2 border-white/20 bg-gradient-to-br from-white/10 to-transparent backdrop-blur-sm flex items-center justify-center">
-                 <motion.div
-                  className="w-24 h-24 rounded-full"
-                  style={{ background: `radial-gradient(circle, ${glowColor}, transparent)` }}
-                  animate={{ scale: [0.8, 1.8], opacity: [0.3, 1] }}
-                  transition={{ repeat: Infinity, duration: 0.5, repeatType: "reverse" }}
-                />
-              </div>
-            </motion.div>
-          )}
-
           {phase === "exploding" && (
             <div className="relative">
               <Particles tier={rarity.tier} />
