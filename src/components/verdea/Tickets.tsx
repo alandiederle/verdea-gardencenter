@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { Volume2, VolumeX } from "lucide-react";
 import { rarities, rollRarity, pickReward } from "./sobres/rarities";
 import OpeningOverlay from "./sobres/OpeningOverlay";
 import DiscoveryGallery, { type Discovery } from "./sobres/DiscoveryGallery";
@@ -9,6 +10,7 @@ export default function Tickets() {
   const [resultIdx, setResultIdx] = useState(0);
   const [reward, setReward] = useState("");
   const [discoveries, setDiscoveries] = useState<Discovery[]>([]);
+  const [soundOn, setSoundOn] = useState(true);
 
   const startOpening = () => {
     if (phase !== "idle") return;
@@ -19,8 +21,7 @@ export default function Tickets() {
   };
 
   return (
-    <section className="py-24 bg-muted/30 flex flex-col items-center min-h-screen">
-      {/* El Overlay ahora maneja toda la interacción de corte */}
+    <section id="sobres" className="py-24 bg-muted/30 flex flex-col items-center min-h-screen">
       <OpeningOverlay 
         phase={phase} 
         setPhase={setPhase} 
@@ -29,17 +30,21 @@ export default function Tickets() {
         addDiscovery={(d) => setDiscoveries(prev => [...prev, d])}
       />
       
-      <div className="text-center mb-16">
+      <div className="text-center mb-16 px-4">
         <h2 className="text-5xl font-serif font-bold mb-4">Sobre de Cultivo</h2>
-        <p className="text-muted-foreground italic">Haz un clic para preparar la apertura</p>
+        <p className="text-muted-foreground italic">Un solo clic para preparar la apertura</p>
       </div>
 
-      {/* Sobre Previo: Clic simple para abrir el Overlay */}
+      <button onClick={() => setSoundOn(!soundOn)} className="mb-8 opacity-40 hover:opacity-100 transition-opacity">
+        {soundOn ? <Volume2 size={24} /> : <VolumeX size={24} />}
+      </button>
+
+      {/* Sobre Previo: Clic simple */}
       <motion.div
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={startOpening}
-        className="relative w-64 aspect-[2/3] cursor-pointer drop-shadow-[0_20px_50px_rgba(0,0,0,0.3)]"
+        className="relative w-64 aspect-[2/3] cursor-pointer drop-shadow-2xl"
       >
         <img src="/images/sobre-verdie.png" className="w-full h-full object-contain" alt="Sobre" />
       </motion.div>
