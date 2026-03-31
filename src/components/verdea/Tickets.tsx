@@ -1,86 +1,82 @@
-import { useState, useCallback } from "react";
-import { motion } from "framer-motion";
-import { Volume2, VolumeX } from "lucide-react";
-import { useScrollAnimation } from "@/hooks/useScrollAnimation";
+import { useState, useRef } from "react";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { rarities, rollRarity, pickReward } from "./sobres/rarities";
 import OpeningOverlay from "./sobres/OpeningOverlay";
 import DiscoveryGallery, { type Discovery } from "./sobres/DiscoveryGallery";
 
-type Phase = "idle" | "charging" | "exploding" | "revealed";
-
 export default function Tickets() {
-  const { ref, isVisible } = useScrollAnimation();
-  const [phase, setPhase] = useState<Phase>("idle");
+  const [phase, setPhase] = useState<"idle" | "charging" | "exploding" | "revealed">("idle");
   const [resultIdx, setResultIdx] = useState(0);
   const [reward, setReward] = useState("");
-  const [soundOn, setSoundOn] = useState(true);
   const [discoveries, setDiscoveries] = useState<Discovery[]>([]);
 
-  const startOpening = useCallback(() => {
-    if (phase !== "idle") return;
-    const idx = rollRarity();
-    const r = rarities[idx];
-    setResultIdx(idx);
-    setReward(pickReward(r));
-    setPhase("charging"); // Abre el Overlay en modo "esperando el corte"
-  }, [phase]);
+  // --- LÓGICA DE MOVIMIENTO 3D (TILT) ---
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
 
-  const closeOverlay = () => setPhase("idle");
+  const mouseXSpring = useSpring(x);
+  const mouseYSpring = useSpring(y);
+
+  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["15deg", "-15deg"]);
+  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-15deg", "15deg"]);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    const xPct = mouseX / width - 0.5;
+    const yPct = mouseY / height - 0.5;
+    x.set(xPct);
+    y.set(yPct);
+  };
+
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
+
+  const startOpening = () => {
+    const idx = rollRarity();
+    setResultIdx(idx);
+    setReward(pickReward(rarities[idx]));
+    setPhase("charging");
+  };
 
   return (
-    <section id="sobres" className="py-24 bg-muted/30 relative overflow-hidden min-h-screen">
-      {/* Overlay de apertura interactiva con el termosellado */}
+    <section className="py-24 bg-muted/30 flex flex-col items-center overflow-hidden min-h-screen">
       <OpeningOverlay 
-        phase={phase} 
-        setPhase={setPhase}
-        rarity={rarities[resultIdx]} 
-        reward={reward} 
-        soundOn={soundOn}
-        addDiscovery={(d) => setDiscoveries(prev => [...prev, d])}
+        phase={phase} setPhase={setPhase} rarity={rarities[resultIdx]} 
+        reward={reward} addDiscovery={(d) => setDiscoveries(prev => [...prev, d])}
       />
       
-      <div ref={ref} className="container mx-auto px-4 flex flex-col items-center">
-        {/* Header */}
-        <div className="text-center max-w-2xl mx-auto mb-16">
-          <motion.h2
-            className="text-3xl sm:text-4xl lg:text-5xl font-serif font-bold text-foreground mb-5 leading-tight"
-            initial={{ opacity: 0, y: 24 }}
-            animate={isVisible ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.7 }}
-          >
-            Tu Jardín de Recompensas
-          </motion.h2>
-          <motion.p
-            className="text-lg font-sans text-muted-foreground max-w-lg mx-auto"
-            initial={{ opacity: 0 }}
-            animate={isVisible ? { opacity: 1 } : {}}
-            transition={{ duration: 0.7, delay: 0.2 }}
-          >
-            Toca el sobre para comenzar el Ritual de Apertura.
-          </motion.p>
+      <div className="text-center mb-16">
+        <h2 className="text-4xl font-serif font-bold mb-2">Sobre de Cultivo</h2>
+        <p className="text-muted-foreground italic">Haz clic para inspeccionar y abrir</p>
+      </div>
+
+      <motion.div
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+        onClick={startOpening}
+        style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
+        className="relative w-64 aspect-[2/3] cursor-pointer group"
+      >
+        {/* EFECTO FOIL (Brillo metálico) */}
+        <div className="absolute inset-0 z-10 pointer-events-none overflow-hidden rounded-2xl">
+          <motion.div 
+            className="absolute inset-[-100%] bg-gradient-to-tr from-transparent via-white/30 to-transparent"
+            animate={{ x: ["-100%", "100%"], y: ["-100%", "100%"] }}
+            transition={{ repeat: Infinity, duration: 3, ease: "linear" }}
+            style={{ mixBlendMode: "overlay" }}
+          />
         </div>
 
-        {/* Sound toggle */}
-        <button onClick={() => setSoundOn(!soundOn)} className="mb-8 opacity-50 hover:opacity-100 transition-opacity">
-          {soundOn ? <Volume2 size={20} /> : <VolumeX size={20} />}
-        </button>
-
-        {/* VISTA PREVIA DEL SOBRE FLOTANTE EN LA PRINCIPAL */}
-        <motion.div
-          className="relative w-64 aspect-[2/3] cursor-pointer"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={startOpening}
-        >
-          <img src="/images/sobre-verdie.png" className="w-full h-full object-contain drop-shadow-2xl" alt="Sobre" />
-          
-          {/* Brillo foil dinámico que se activa al hover */}
-          <div className="absolute inset-0 bg-white/10 opacity-0 hover:opacity-100 transition-opacity rounded-2xl" />
-        </motion.div>
-        
-        <p className="mt-8 font-serif text-xl font-bold text-secondary">Toca para abrir</p>
-        
-        {/* Galería de descubrimientos previos */}
+        <img src="/images/sobre-verdie.png" className="w-full h-full object-contain drop-shadow-2xl" alt="Sobre" />
+      </motion.div>
+      
+      <div className="mt-20 w-full max-w-4xl px-4">
         <DiscoveryGallery discoveries={discoveries} />
       </div>
     </section>
