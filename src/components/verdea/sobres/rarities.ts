@@ -1,12 +1,10 @@
-/* ─── 6-tier rarity system: Sobres de Crecimiento ─── */
-
 export interface Rarity {
   name: string;
   chance: number;
   label: string;
-  color: string;        // bg class
-  glowHsl: string;      // raw HSL for glow effects
-  textColor: string;    // text class
+  color: string;
+  glowHsl: string;
+  textColor: string;
   tier: number;
   rewards: string[];
 }
@@ -20,7 +18,7 @@ export const rarities: Rarity[] = [
     glowHsl: "140,25%,65%",
     textColor: "text-[hsl(150,30%,22%)]",
     tier: 0,
-    rewards: ["Puntos extra", "Multiplicador temporal ×2", "Descuento 5 %", "Acceso anticipado"],
+    rewards: ["Puntos extra", "Multiplicador temporal ×2", "Descuento 5 %"],
   },
   {
     name: "Brote",
@@ -30,7 +28,7 @@ export const rarities: Rarity[] = [
     glowHsl: "147,40%,50%",
     textColor: "text-[hsl(147,42%,18%)]",
     tier: 1,
-    rewards: ["Maceta gratis", "Envío bonificado", "Planta sorpresa pequeña", "Tickets extra"],
+    rewards: ["Maceta gratis", "Envío bonificado", "Planta sorpresa pequeña"],
   },
   {
     name: "Polen",
@@ -40,7 +38,7 @@ export const rarities: Rarity[] = [
     glowHsl: "340,45%,65%",
     textColor: "text-[hsl(340,38%,28%)]",
     tier: 2,
-    rewards: ["Planta premium", "Descuento 25 %", "Taller online", "Consulta con experto"],
+    rewards: ["Planta premium", "Descuento 25 %", "Taller online"],
   },
   {
     name: "Raíz",
@@ -50,7 +48,7 @@ export const rarities: Rarity[] = [
     glowHsl: "43,55%,55%",
     textColor: "text-[hsl(43,45%,20%)]",
     tier: 3,
-    rewards: ["Crédito en tienda", "Planta colección Araceae", "Box sorpresa Verdie"],
+    rewards: ["Crédito en tienda", "Planta colección Araceae", "Box sorpresa"],
   },
   {
     name: "Exótica",
@@ -60,7 +58,7 @@ export const rarities: Rarity[] = [
     glowHsl: "270,45%,70%",
     textColor: "text-[hsl(270,35%,25%)]",
     tier: 4,
-    rewards: ["Planta importada exclusiva", "Crédito alto", "Membresía Flor (1 mes)"],
+    rewards: ["Planta importada exclusiva", "Membresía Flor (1 mes)"],
   },
   {
     name: "Primordial",
@@ -70,7 +68,7 @@ export const rarities: Rarity[] = [
     glowHsl: "43,65%,60%",
     textColor: "text-[hsl(43,50%,18%)]",
     tier: 5,
-    rewards: ["Planta edición limitada", "Membresía Árbol (1 mes)", "Crédito máximo"],
+    rewards: ["Planta edición limitada", "Membresía Árbol (1 mes)"],
   },
 ];
 
