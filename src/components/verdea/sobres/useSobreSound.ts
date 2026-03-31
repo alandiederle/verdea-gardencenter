@@ -14,7 +14,7 @@ export function useSobreSound(enabled: boolean) {
 
   return {
     // Agarre es .wav, el resto .mp3
-    playWindUp: () => playFile("agarre.wav", 0.4), 
+    playWindUp: () => playFile("agarre.mp3", 0.4), 
     playChargeUp: () => playFile("abrir.mp3", 0.8),
     playReveal: (tier: number) => {
       if (tier >= 4) playFile("legendario.mp3", 0.9);
