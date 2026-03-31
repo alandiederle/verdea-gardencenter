@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Volume2, VolumeX } from "lucide-react";
 import { rarities, rollRarity, pickReward } from "./sobres/rarities";
@@ -12,15 +12,25 @@ export default function Tickets() {
   const [soundOn, setSoundOn] = useState(true);
   const [discoveries, setDiscoveries] = useState<Discovery[]>([]);
 
+  // PRECARGA: Esto asegura que el sobre grande cargue instantáneo
+  useEffect(() => {
+    const img = new Image();
+    img.src = "/images/sobre-verdie.png";
+  }, []);
+
   const startOpening = useCallback(() => {
+    if (phase !== "idle") return;
     const idx = rollRarity();
     setResultIdx(idx);
     setReward(pickReward(rarities[idx]));
     setPhase("charging");
-  }, []);
+  }, [phase]);
 
   return (
-    <section id="sobres" className="py-24 bg-muted/30 flex flex-col items-center min-h-screen">
+    <section id="sobres" className="py-24 bg-muted/30 flex flex-col items-center min-h-screen relative">
+      {/* Imagen invisible para forzar caché */}
+      <img src="/images/sobre-verdie.png" className="hidden" aria-hidden="true" />
+
       <OpeningOverlay 
         phase={phase} 
         setPhase={setPhase} 
@@ -32,7 +42,7 @@ export default function Tickets() {
       
       <div className="text-center mb-16 px-4">
         <h2 className="text-5xl font-serif font-bold mb-4">Sobre de Cultivo</h2>
-        <p className="text-muted-foreground font-light tracking-wide italic">Toca el sobre para preparar el ritual</p>
+        <p className="text-muted-foreground italic">Toca el sobre para preparar el ritual</p>
       </div>
 
       <button onClick={() => setSoundOn(!soundOn)} className="mb-8 opacity-40 hover:opacity-100 transition-opacity">
@@ -43,14 +53,9 @@ export default function Tickets() {
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={startOpening}
-        className="relative w-64 aspect-[2/3] cursor-pointer"
+        className="relative w-64 aspect-[2/3] cursor-pointer drop-shadow-2xl"
       >
-        <img 
-          src="/images/sobre-verdie.png" 
-          className="w-full h-full object-contain drop-shadow-2xl" 
-          alt="Sobre" 
-          draggable={false} 
-        />
+        <img src="/images/sobre-verdie.png" className="w-full h-full object-contain" alt="Sobre" draggable={false} />
       </motion.div>
       
       <div className="mt-20 w-full max-w-4xl px-4">
