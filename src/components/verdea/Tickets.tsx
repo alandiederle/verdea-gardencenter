@@ -10,69 +10,44 @@ export default function Tickets() {
   const [reward, setReward] = useState("");
   const [discoveries, setDiscoveries] = useState<Discovery[]>([]);
 
-  // --- LÓGICA DE MOVIMIENTO 3D (TILT) ---
+  // Físicas del mouse (Tilt 3D)
   const x = useMotionValue(0);
   const y = useMotionValue(0);
-
   const mouseXSpring = useSpring(x);
   const mouseYSpring = useSpring(y);
-
-  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["15deg", "-15deg"]);
-  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-15deg", "15deg"]);
+  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["10deg", "-10deg"]);
+  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-10deg", "10deg"]);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
-    const width = rect.width;
-    const height = rect.height;
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-    const xPct = mouseX / width - 0.5;
-    const yPct = mouseY / height - 0.5;
-    x.set(xPct);
-    y.set(yPct);
-  };
-
-  const handleMouseLeave = () => {
-    x.set(0);
-    y.set(0);
-  };
-
-  const startOpening = () => {
-    const idx = rollRarity();
-    setResultIdx(idx);
-    setReward(pickReward(rarities[idx]));
-    setPhase("charging");
+    x.set((e.clientX - rect.left) / rect.width - 0.5);
+    y.set((e.clientY - rect.top) / rect.height - 0.5);
   };
 
   return (
-    <section className="py-24 bg-muted/30 flex flex-col items-center overflow-hidden min-h-screen">
+    <section className="py-24 bg-muted/30 flex flex-col items-center min-h-screen">
       <OpeningOverlay 
         phase={phase} setPhase={setPhase} rarity={rarities[resultIdx]} 
         reward={reward} addDiscovery={(d) => setDiscoveries(prev => [...prev, d])}
       />
       
       <div className="text-center mb-16">
-        <h2 className="text-4xl font-serif font-bold mb-2">Sobre de Cultivo</h2>
-        <p className="text-muted-foreground italic">Haz clic para inspeccionar y abrir</p>
+        <h2 className="text-5xl font-serif font-bold mb-4">Sobre de Cultivo</h2>
+        <p className="text-muted-foreground italic">Haz clic para abrir el ritual</p>
       </div>
 
       <motion.div
         onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
-        onClick={startOpening}
+        onMouseLeave={() => { x.set(0); y.set(0); }}
+        onClick={() => {
+          const idx = rollRarity();
+          setResultIdx(idx);
+          setReward(pickReward(rarities[idx]));
+          setPhase("charging");
+        }}
         style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
-        className="relative w-64 aspect-[2/3] cursor-pointer group"
+        className="relative w-64 aspect-[2/3] cursor-pointer"
       >
-        {/* EFECTO FOIL (Brillo metálico) */}
-        <div className="absolute inset-0 z-10 pointer-events-none overflow-hidden rounded-2xl">
-          <motion.div 
-            className="absolute inset-[-100%] bg-gradient-to-tr from-transparent via-white/30 to-transparent"
-            animate={{ x: ["-100%", "100%"], y: ["-100%", "100%"] }}
-            transition={{ repeat: Infinity, duration: 3, ease: "linear" }}
-            style={{ mixBlendMode: "overlay" }}
-          />
-        </div>
-
         <img src="/images/sobre-verdie.png" className="w-full h-full object-contain drop-shadow-2xl" alt="Sobre" />
       </motion.div>
       
