@@ -1,5 +1,5 @@
-import { useState, useRef } from "react";
-import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { useState } from "react";
+import { motion } from "framer-motion";
 import { rarities, rollRarity, pickReward } from "./sobres/rarities";
 import OpeningOverlay from "./sobres/OpeningOverlay";
 import DiscoveryGallery, { type Discovery } from "./sobres/DiscoveryGallery";
@@ -10,45 +10,38 @@ export default function Tickets() {
   const [reward, setReward] = useState("");
   const [discoveries, setDiscoveries] = useState<Discovery[]>([]);
 
-  // Físicas del mouse (Tilt 3D)
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  const mouseXSpring = useSpring(x);
-  const mouseYSpring = useSpring(y);
-  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["10deg", "-10deg"]);
-  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-10deg", "10deg"]);
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    x.set((e.clientX - rect.left) / rect.width - 0.5);
-    y.set((e.clientY - rect.top) / rect.height - 0.5);
+  const startOpening = () => {
+    if (phase !== "idle") return;
+    const idx = rollRarity();
+    setResultIdx(idx);
+    setReward(pickReward(rarities[idx]));
+    setPhase("charging");
   };
 
   return (
     <section className="py-24 bg-muted/30 flex flex-col items-center min-h-screen">
+      {/* El Overlay ahora maneja toda la interacción de corte */}
       <OpeningOverlay 
-        phase={phase} setPhase={setPhase} rarity={rarities[resultIdx]} 
-        reward={reward} addDiscovery={(d) => setDiscoveries(prev => [...prev, d])}
+        phase={phase} 
+        setPhase={setPhase} 
+        rarity={rarities[resultIdx]} 
+        reward={reward} 
+        addDiscovery={(d) => setDiscoveries(prev => [...prev, d])}
       />
       
       <div className="text-center mb-16">
         <h2 className="text-5xl font-serif font-bold mb-4">Sobre de Cultivo</h2>
-        <p className="text-muted-foreground italic">Haz clic para abrir el ritual</p>
+        <p className="text-muted-foreground italic">Haz un clic para preparar la apertura</p>
       </div>
 
+      {/* Sobre Previo: Clic simple para abrir el Overlay */}
       <motion.div
-        onMouseMove={handleMouseMove}
-        onMouseLeave={() => { x.set(0); y.set(0); }}
-        onClick={() => {
-          const idx = rollRarity();
-          setResultIdx(idx);
-          setReward(pickReward(rarities[idx]));
-          setPhase("charging");
-        }}
-        style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
-        className="relative w-64 aspect-[2/3] cursor-pointer"
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        onClick={startOpening}
+        className="relative w-64 aspect-[2/3] cursor-pointer drop-shadow-[0_20px_50px_rgba(0,0,0,0.3)]"
       >
-        <img src="/images/sobre-verdie.png" className="w-full h-full object-contain drop-shadow-2xl" alt="Sobre" />
+        <img src="/images/sobre-verdie.png" className="w-full h-full object-contain" alt="Sobre" />
       </motion.div>
       
       <div className="mt-20 w-full max-w-4xl px-4">
