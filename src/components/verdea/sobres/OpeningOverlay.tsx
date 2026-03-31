@@ -14,93 +14,141 @@ interface Props {
 
 export default function OpeningOverlay({ phase, setPhase, rarity, reward, soundOn, addDiscovery }: Props) {
   const sound = useSobreSound(soundOn);
-  const sobreRef = useRef<HTMLDivElement>(null);
-  
-  // Valores para el gesto de corte
+  const [isCut, setIsCut] = useState(false);
   const dragX = useMotionValue(0);
-  const rotateZ = useTransform(dragX, [-200, 200], [-10, 10]);
+  
+  // Opacidad de la guía: desaparece cuando empiezas a cortar
+  const guideOpacity = useTransform(dragX, [-50, 0, 50], [0, 1, 0]);
 
   if (phase === "idle") return null;
 
-  const handleDragEnd = (_: any, info: any) => {
-    // Si el movimiento fue rápido y largo, "cortamos" el sobre
+  const handleDrag = (_: any, info: any) => {
+    if (isCut) return;
+
+    // Detectamos un tajo rápido en la parte superior
     const velocity = Math.abs(info.velocity.x);
     const offset = Math.abs(info.offset.x);
 
-    if (velocity > 300 || offset > 100) {
-      sound.playChargeUp(); // AQUÍ SUENA TU "ABRIR.MP3" (EL TRACCC)
+    if (velocity > 400 || offset > 120) {
+      setIsCut(true);
+      sound.playChargeUp(); // Tu sonido "traccc"
       
       setPhase("exploding");
+      
       setTimeout(() => {
         setPhase("revealed");
         sound.playReveal(rarity.tier);
         addDiscovery({ rarity, reward, timestamp: Date.now() });
-      }, 1000);
+      }, 1200);
     }
   };
 
-  return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-2xl overflow-hidden">
-      <AnimatePresence>
-        {/* INSTRUCCIONES AL ESTAR EN MODO CARGA */}
-        {phase === "charging" && (
-          <div className="relative flex flex-col items-center">
-            <motion.div 
-              initial={{ y: -20, opacity: 0 }} 
-              animate={{ y: 0, opacity: 1 }}
-              className="absolute -top-32 text-center w-full"
-            >
-              <p className="text-white font-serif text-2xl font-bold tracking-widest uppercase mb-2">
-                Ritual de Apertura
-              </p>
-              <motion.p 
-                animate={{ opacity: [0.4, 1, 0.4] }}
-                transition={{ repeat: Infinity, duration: 1.5 }}
-                className="text-secondary font-sans text-sm font-bold"
-              >
-                ← DESLIZA RÁPIDO PARA CORTAR →
-              </motion.p>
-            </motion.div>
+  const glowColor = `hsl(${rarity?.glowHsl || '140, 50%, 50%'})`;
 
-            <motion.div
-              ref={sobreRef}
-              drag="x"
-              dragConstraints={{ left: 0, right: 0 }}
-              dragElastic={0.2}
-              onDragEnd={handleDragEnd}
-              onDragStart={() => sound.playWindUp()}
-              style={{ x: dragX, rotateZ }}
-              className="relative w-80 aspect-[2/3] cursor-grab active:cursor-grabbing"
-            >
-              <img 
-                src="/images/sobre-verdie.png" 
-                className="w-full h-full object-contain drop-shadow-[0_0_50px_rgba(255,255,255,0.2)] pointer-events-none" 
-                alt="Sobre Grande" 
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/98 backdrop-blur-3xl overflow-hidden">
+      <AnimatePresence>
+        {(phase === "charging" || phase === "exploding") && (
+          <div className="relative w-80 aspect-[2/3]">
+            
+            {/* 1. GUÍA VISUAL: Flecha y Texto */}
+            {!isCut && (
+              <motion.div 
+                style={{ opacity: guideOpacity }}
+                className="absolute -top-20 inset-x-0 z-50 flex flex-col items-center pointer-events-none"
+              >
+                <motion.div 
+                  animate={{ y: [0, 5, 0] }}
+                  transition={{ repeat: Infinity, duration: 1 }}
+                  className="mb-2 text-secondary"
+                >
+                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M7 13l5 5 5-5M12 18V6" />
+                  </svg>
+                </motion.div>
+                <p className="text-white font-black text-xs uppercase tracking-[0.3em] bg-black/50 px-4 py-1 rounded-full border border-white/10">
+                  Desliza aquí para abrir
+                </p>
+                {/* Línea de termosellado visual */}
+                <div className="w-64 h-px bg-white/30 mt-12 border-t border-dashed border-white/50" />
+              </motion.div>
+            )}
+
+            {/* 2. EL SOBRE: Dividido en dos piezas */}
+            <div className="relative w-full h-full">
+              
+              {/* PIEZA DE ARRIBA (La que sale volando) */}
+              <motion.div
+                className="absolute inset-0 z-30"
+                style={{ 
+                  clipPath: "inset(0 0 85% 0)", // Solo muestra el 15% superior
+                  x: dragX 
+                }}
+                drag="x"
+                dragConstraints={{ left: 0, right: 0 }}
+                onDrag={handleDrag}
+                animate={isCut ? { 
+                  y: -400, 
+                  x: 100, 
+                  rotate: 45, 
+                  opacity: 0 
+                } : { y: 0 }}
+                transition={{ type: "spring", stiffness: 50 }}
+              >
+                <img src="/images/sobre-verdie.png" className="w-full h-full object-contain" alt="" />
+              </motion.div>
+
+              {/* PIEZA DE ABAJO (La que se queda) */}
+              <motion.div
+                className="absolute inset-0 z-20"
+                style={{ clipPath: "inset(15% 0 0 0)" }} // Muestra el resto del sobre
+                animate={isCut ? { y: 20, scale: 0.95 } : { y: 0 }}
+              >
+                <img src="/images/sobre-verdie.png" className="w-full h-full object-contain" alt="" />
+              </motion.div>
+
+              {/* 3. EFECTO DE LUCES (Según Rareza) */}
+              {isCut && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.5 }}
+                  animate={{ opacity: [0, 1, 0], scale: [1, 2, 2.5] }}
+                  transition={{ duration: 1 }}
+                  className="absolute inset-0 z-10 blur-[100px] rounded-full"
+                  style={{ backgroundColor: glowColor }}
+                />
+              )}
+            </div>
+
+            {/* Partículas de luz emergiendo del corte */}
+            {isCut && (
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="absolute top-[15%] left-1/2 -translate-x-1/2 w-full h-2 shadow-[0_-20px_100px_20px] z-40"
+                style={{ color: glowColor, boxShadow: `0 -10px 60px ${glowColor}` }}
               />
-              {/* Brillo de guía */}
-              <div className="absolute inset-x-0 top-1/2 h-1 bg-gradient-to-r from-transparent via-white/20 to-transparent blur-sm pointer-events-none" />
-            </motion.div>
+            )}
           </div>
         )}
 
-        {/* REVELACIÓN DEL PREMIO */}
+        {/* REVELACIÓN FINAL */}
         {phase === "revealed" && (
           <motion.div 
-            initial={{ scale: 0.8, opacity: 0 }} 
-            animate={{ scale: 1, opacity: 1 }} 
-            className="text-center p-8 max-w-lg"
+            initial={{ y: 50, opacity: 0 }} 
+            animate={{ y: 0, opacity: 1 }} 
+            className="text-center"
           >
-            <div className={`inline-block px-8 py-3 rounded-full mb-8 font-bold text-lg shadow-2xl ${rarity.color} ${rarity.textColor}`}>
+            <div className={`inline-block px-10 py-3 rounded-full mb-8 font-black text-xl shadow-[0_0_50px_rgba(255,255,255,0.1)] ${rarity.color} ${rarity.textColor}`}>
               {rarity.name}
             </div>
-            <h2 className="text-6xl font-serif font-bold text-white mb-12 drop-shadow-lg leading-tight">
+            <h2 className="text-7xl font-serif font-bold text-white mb-12 leading-tight">
               {reward}
             </h2>
             <button 
-              onClick={() => setPhase("idle")} 
-              className="px-12 py-5 bg-white text-black font-black rounded-full hover:scale-105 transition-transform uppercase tracking-tighter"
+              onClick={() => { setIsCut(false); setPhase("idle"); }} 
+              className="px-16 py-6 bg-white text-black font-black rounded-full text-xl hover:scale-105 transition-transform"
             >
-              Cerrar y Guardar
+              CULTIVAR PREMIO
             </button>
           </motion.div>
         )}
