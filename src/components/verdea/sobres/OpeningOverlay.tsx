@@ -60,7 +60,7 @@ export default function OpeningOverlay({ phase, setPhase, rarity, reward, soundO
         addDiscovery({ rarity, reward, timestamp: Date.now() });
       }, 1200);
     }
-  }, [isCut, phase, sound, setPhase, rarities]);
+  }, [isCut, phase, sound, setPhase, rarity, reward, addDiscovery]);
 
   const glowColor = `hsl(${rarity?.glowHsl || '140, 50%, 50%'})`;
 
