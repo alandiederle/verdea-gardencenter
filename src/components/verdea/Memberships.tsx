@@ -1,143 +1,129 @@
-import { useScrollAnimation } from "@/hooks/useScrollAnimation";
-import { Check } from "lucide-react";
+import { motion } from "framer-motion";
+import { Check, Sparkles, Zap, Leaf, TreePine, Flower2 } from "lucide-react";
 
-const tiers = [
+const plans = [
   {
     name: "Semilla",
-    emoji: "🌱",
+    icon: <Leaf className="w-6 h-6" />,
     price: "Gratis",
     multiplier: "x1",
-    features: ["Acceso básico", "Participación estándar en sorteos", "Newsletter exclusiva"],
-    cta: "Comenzar gratis",
-    featured: false,
-    badge: null,
-    height: "h-[400px]",
+    features: ["Acceso básico al club", "Sorteos estándar", "Newsletter"],
+    color: "bg-slate-100",
+    textColor: "text-slate-900",
+    border: "border-slate-200",
+    button: "bg-slate-900 text-white"
   },
   {
     name: "Brote",
-    emoji: "🌿",
-    price: "$5/mes",
+    icon: <Zap className="w-6 h-6" />,
+    price: "$5",
     multiplier: "x1.25",
-    features: ["1 ticket bonus mensual", "Acceso anticipado a ofertas", "Descuento en subastas", "+25% puntos"],
-    cta: "Elegir Brote",
-    featured: false,
-    badge: null,
-    height: "h-[440px]",
+    features: ["1 ticket bonus mensual", "Acceso anticipado a ofertas", "Descuento en subastas"],
+    color: "bg-emerald-50",
+    textColor: "text-emerald-900",
+    border: "border-emerald-200",
+    button: "bg-emerald-600 text-white"
   },
   {
     name: "Flor",
-    emoji: "🌸",
-    price: "$10/mes",
+    icon: <Flower2 className="w-6 h-6" />,
+    price: "$10",
     multiplier: "x2",
-    features: ["3 tickets bonus", "Envío bonificado", "Sorteos exclusivos", "Regalo trimestral sorpresa", "Doble puntos"],
-    cta: "Elegir Flor",
-    featured: true,
-    badge: "Más elegido",
-    height: "h-[480px]",
+    features: ["3 tickets bonus", "Envío bonificado", "Regalo trimestral", "Sorteos exclusivos"],
+    color: "bg-fuchsia-50",
+    textColor: "text-fuchsia-900",
+    border: "border-fuchsia-200",
+    button: "bg-fuchsia-600 text-white",
+    popular: true
   },
   {
     name: "Árbol",
-    emoji: "🌳",
-    price: "$25/mes",
+    icon: <TreePine className="w-6 h-6" />,
+    price: "$25",
     multiplier: "x4",
-    features: [
-      "10 tickets bonus",
-      "Sorteos premium",
-      "Regalo mensual",
-      "Acceso anticipado 48h",
-      "Eventos de comunidad",
-      "Doble participación subastas",
-      "Cuádruple puntos",
-    ],
-    cta: "Convertirme en Árbol",
-    featured: false,
-    badge: "Máxima evolución",
-    height: "h-[520px]",
-  },
+    features: ["10 tickets bonus", "Acceso anticipado 48h", "Regalo mensual premium", "Doble participación subastas"],
+    color: "bg-[#1a1c1a]", // Verde bosque muy oscuro
+    textColor: "text-white",
+    border: "border-amber-500/50",
+    button: "bg-gradient-to-r from-amber-500 to-amber-600 text-white",
+    premium: true
+  }
 ];
 
 export default function Memberships() {
-  const { ref, isVisible } = useScrollAnimation();
-
   return (
-    <section id="memberships" className="py-24 lg:py-32 bg-background">
-      <div ref={ref} className="container mx-auto px-4">
-        <div className="text-center max-w-2xl mx-auto mb-16">
-          <h2
-            className={`text-3xl sm:text-4xl lg:text-5xl font-serif font-bold text-foreground mb-4 transition-all duration-700 ${
-              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-            }`}
-          >
-            Elegí cómo querés crecer.
-          </h2>
-          <p className={`text-lg font-sans text-muted-foreground transition-all duration-700 delay-200 ${isVisible ? "opacity-100" : "opacity-0"}`}>
-            La evolución natural de tu experiencia en Verdie.
+    <section className="py-24 bg-background overflow-hidden">
+      <div className="container mx-auto px-4">
+        
+        <div className="text-center mb-16">
+          <h2 className="text-4xl md:text-5xl font-serif font-bold mb-4">Elegí cómo querés crecer</h2>
+          <p className="text-muted-foreground font-sans max-w-xl mx-auto italic">
+            La evolución natural de tu experiencia en Verdie. Cada nivel desbloquea nuevas capas de tu ecosistema.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto items-end">
-          {tiers.map((tier, i) => (
-            <div
-              key={tier.name}
-              className={`relative rounded-2xl border p-6 flex flex-col transition-all duration-700 hover:shadow-xl group ${
-                tier.featured
-                  ? "bg-primary text-primary-foreground border-primary shadow-xl scale-[1.03]"
-                  : "bg-card border-border hover:border-secondary/30"
-              } ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"}`}
-              style={{ transitionDelay: `${300 + i * 150}ms` }}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {plans.map((plan, idx) => (
+            <motion.div
+              key={plan.name}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: idx * 0.1 }}
+              viewport={{ once: true }}
+              whileHover={{ y: -10 }}
+              className={`relative p-8 rounded-[2rem] border-2 ${plan.border} ${plan.color} ${plan.textColor} flex flex-col h-full shadow-xl`}
             >
-              {tier.badge && (
-                <span
-                  className={`absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-xs font-semibold font-sans ${
-                    tier.featured
-                      ? "bg-accent text-accent-foreground"
-                      : "bg-secondary text-secondary-foreground"
-                  }`}
-                >
-                  {tier.badge}
-                </span>
+              {/* Badge de "Más Elegido" o "Máxima Evolución" */}
+              {plan.popular && (
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-fuchsia-600 text-white text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full shadow-lg">
+                  Más Elegido
+                </div>
+              )}
+              {plan.premium && (
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-amber-500 text-black text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full shadow-lg flex items-center gap-1">
+                  <Sparkles size={10} /> Máxima Evolución
+                </div>
               )}
 
-              <div className="text-center mb-6">
-                <span className="text-4xl mb-3 block">{tier.emoji}</span>
-                <h3 className="font-serif text-xl font-bold mb-1">{tier.name}</h3>
-                <p className="text-2xl font-bold font-sans">{tier.price}</p>
-                <span
-                  className={`text-xs font-sans font-medium ${
-                    tier.featured ? "text-primary-foreground/70" : "text-accent"
-                  }`}
-                >
-                  {tier.multiplier} puntos
-                </span>
+              {/* Header del Plan */}
+              <div className="mb-8">
+                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-4 ${plan.premium ? 'bg-amber-500/10 text-amber-500' : 'bg-current opacity-10 text-inherit'}`}>
+                  {plan.icon}
+                </div>
+                <h3 className="text-2xl font-serif font-bold mb-1">{plan.name}</h3>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-4xl font-black">{plan.price}</span>
+                  {plan.price !== "Gratis" && <span className="text-xs opacity-60">/mes</span>}
+                </div>
               </div>
 
-              <ul className="space-y-3 flex-1 mb-6">
-                {tier.features.map((f) => (
-                  <li key={f} className="flex items-start gap-2 text-sm font-sans">
-                    <Check
-                      className={`w-4 h-4 mt-0.5 shrink-0 ${
-                        tier.featured ? "text-accent" : "text-secondary"
-                      }`}
-                    />
-                    <span className={tier.featured ? "text-primary-foreground/90" : "text-muted-foreground"}>
-                      {f}
-                    </span>
+              {/* Multiplicador de XP (Factor de Gamificación) */}
+              <div className={`mb-8 p-3 rounded-xl border border-current/10 flex items-center justify-between`}>
+                <span className="text-[10px] font-black uppercase tracking-widest">Multiplicador XP</span>
+                <span className={`text-lg font-black ${plan.premium ? 'text-amber-500' : ''}`}>{plan.multiplier}</span>
+              </div>
+
+              {/* Características */}
+              <ul className="space-y-4 mb-10 flex-1">
+                {plan.features.map((feature) => (
+                  <li key={feature} className="flex items-start gap-3 text-sm leading-tight">
+                    <Check className="w-4 h-4 shrink-0 mt-0.5 opacity-60" />
+                    <span>{feature}</span>
                   </li>
                 ))}
               </ul>
 
-              <button
-                className={`w-full py-3 rounded-full text-sm font-semibold font-sans transition-all hover:scale-105 ${
-                  tier.featured
-                    ? "bg-accent text-accent-foreground hover:bg-verdea-gold-light"
-                    : "bg-primary text-primary-foreground hover:bg-secondary"
-                }`}
-              >
-                {tier.cta}
+              {/* Botón de Acción */}
+              <button className={`w-full py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all hover:scale-[1.02] active:scale-95 shadow-lg ${plan.button}`}>
+                {plan.price === "Gratis" ? "Empezar ahora" : `Elegir ${plan.name}`}
               </button>
-            </div>
+            </motion.div>
           ))}
         </div>
+
+        <p className="text-center mt-12 text-xs text-muted-foreground">
+          * Podés cancelar o cambiar de plan en cualquier momento desde tu Ecosistema.
+        </p>
       </div>
     </section>
   );
