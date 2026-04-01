@@ -1,40 +1,26 @@
 import Navbar from "@/components/verdea/Navbar";
-import Hero from "@/components/verdea/Hero";
-import Collections from "@/components/verdea/Collections";
-import Problem from "@/components/verdea/Problem";
-import Ecosystem from "@/components/verdea/Ecosystem";
-import MetodoVerdie from "@/components/verdea/MetodoVerdie";
-import Tickets from "@/components/verdea/Tickets";
-import Memberships from "@/components/verdea/Memberships";
-import Catalog from "@/components/verdea/Catalog";
-import Auctions from "@/components/verdea/Auctions";
-import Community from "@/components/verdea/Community";
-import Manifesto from "@/components/verdea/Manifesto";
-import FAQ from "@/components/verdea/FAQ";
-import FinalCTA from "@/components/verdea/FinalCTA";
-import Footer from "@/components/verdea/Footer";
-import SocialProof from "@/components/verdea/SocialProof";
 import ProgressBar from "@/components/verdea/ProgressBar";
+import { Outlet } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { useLocation } from "react-router-dom";
 
 const Index = () => {
+  const location = useLocation();
+
   return (
     <main className="min-h-screen bg-background pb-12">
       <Navbar />
-      <Hero />
-      <Collections />
-      <Problem />
-      <Ecosystem />
-      <MetodoVerdie />
-      <Tickets />
-      <Memberships />
-      <Catalog />
-      <Auctions />
-      <Community />
-      <Manifesto />
-      <FAQ />
-      <FinalCTA />
-      <Footer />
-      <SocialProof />
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={location.pathname}
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -12 }}
+          transition={{ duration: 0.3 }}
+        >
+          <Outlet />
+        </motion.div>
+      </AnimatePresence>
       <ProgressBar />
     </main>
   );
