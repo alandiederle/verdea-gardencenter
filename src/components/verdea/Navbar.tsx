@@ -4,8 +4,8 @@ import { Leaf, Menu, X } from "lucide-react";
 
 const navLinks = [
   { label: "Inicio", to: "/" },
-  { label: "Abrir Sobre", to: "/abrir" },
-  { label: "Mi Jardín", to: "/mi-jardin" },
+  { label: "Laboratorio", to: "/abrir" }, // O "Portal de Evolución"
+  { label: "Mi Ecosistema", to: "/mi-jardin" }, 
 ];
 
 export default function Navbar() {
